@@ -34,3 +34,4 @@ CREATE TABLE quiz_results (
   quiz_id INTEGER REFERENCES quizzes(id) ON DELETE CASCADE,
   result SMALLINT
 );
+
