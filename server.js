@@ -48,13 +48,81 @@ app.use("/api/widgets", widgetsRoutes(db));
 // Warning: avoid creating more routes in this file!
 // Separate them into separate routes files (see above).
 
-app.get("/", (req, res) => {
-  res.render("index");
+app.get("/api/quizzes", (req, res) => {
+  const sqlQuery = `
+  SELECT quizzes.title, users.name
+  FROM quizzes
+  JOIN users ON users.id = user_id
+  ;
+  `
+  db.query(sqlQuery)
+  .then((dbRes) =>res.json(dbRes.rows))
+  .catch((err) => console.log(err));
+
 });
+
+app.get("/api/users", (req, res) => {
+  const sqlQuery = `
+  SELECT *
+  FROM users
+  ;
+  `
+  db.query(sqlQuery)
+  .then((dbRes) =>res.json(dbRes.rows))
+  .catch((err) => console.log(err));
+});
+
+app.post("/api/users", (req, res) => {
+  const {name, email, password} = req.body
+  const sqlQuery = `
+  INSERT INTO
+    users(name, email, password)
+  VALUES
+    ($1, $2, $3)
+  RETURNING *
+  `
+  db.query(sqlQuery, [name, email, password])
+    .then(() => res.redirect("/quizzes"))
+    .catch((err) => console.log(err));
+});
+
+
+
+app.get("/", (req, res) => {
+
+  res.redirect("/quizzes");
+
+});
+
+app.get("/quizzes", (req, res) => {
+  const sqlQuery = `
+  SELECT quizzes.title, users.name
+  FROM quizzes
+  JOIN users ON users.id = user_id
+  ;
+  `
+
+  db.query(sqlQuery)
+  .then((dbRes) => {
+    const templateVars = {
+      quizzes: dbRes.rows
+    }
+    res.render("index", templateVars)
+    console.log(dbRes.rows);
+
+
+  })
+  .catch((err) => console.log(err));
+})
+
 
 app.get("/newquiz", (req, res) => {
   res.render("createQuiz");
 });
+
+app.post("/newquiz"), (req, res) => {
+
+}
 
 app.get("/login", (req, res) => {
   res.render("login");
