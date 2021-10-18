@@ -7,6 +7,7 @@ const sassMiddleware = require("./lib/sass-middleware");
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cookieSession = require("cookie-session");
 
 // PG database client/connection setup
 const { Pool } = require("pg");
@@ -21,6 +22,13 @@ app.use(morgan("dev"));
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ['QUIZZAPP'],
+  maxAge: 24 * 60 * 60 * 1000,
+}));
+
 
 app.use(
   "/styles",
@@ -56,8 +64,8 @@ app.get("/api/quizzes", (req, res) => {
   ;
   `
   db.query(sqlQuery)
-  .then((dbRes) =>res.json(dbRes.rows))
-  .catch((err) => console.log(err));
+    .then((dbRes) => res.json(dbRes.rows))
+    .catch((err) => console.log(err));
 
 });
 
@@ -68,12 +76,25 @@ app.get("/api/users", (req, res) => {
   ;
   `
   db.query(sqlQuery)
-  .then((dbRes) =>res.json(dbRes.rows))
-  .catch((err) => console.log(err));
+    .then((dbRes) => res.json(dbRes.rows))
+    .catch((err) => console.log(err));
 });
 
 app.post("/register", (req, res) => {
-  const {name, email, password} = req.body
+  const { name, email, password } = req.body
+  console.log("session " + req.session.user_id);
+  console.log("params " + req.params.user_id);
+  const gotEmail = req.body.email;
+  const gotPassword = req.body.password;
+
+  if (!gotEmail || !gotPassword) {
+    res.status(400).send("Invalid email or password!");
+  }
+  /*
+    if (userEmailExists(gotEmail, users)) {
+      res.status(400).send("Email is already registered!");
+    }
+  */
   const sqlQuery = `
   INSERT INTO
     users(name, email, password)
@@ -122,16 +143,16 @@ app.get("/quizzes", (req, res) => {
   `
 
   db.query(sqlQuery)
-  .then((dbRes) => {
-    const templateVars = {
-      quizzes: dbRes.rows
-    }
-    res.render("index", templateVars)
-    console.log(dbRes.rows);
+    .then((dbRes) => {
+      const templateVars = {
+        quizzes: dbRes.rows
+      }
+      res.render("index", templateVars)
+      console.log(dbRes.rows);
 
 
-  })
-  .catch((err) => console.log(err));
+    })
+    .catch((err) => console.log(err));
 })
 
 
@@ -147,8 +168,31 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  }
+};
+
 app.get("/register", (req, res) => {
-  res.render("register");
+  console.log("Gsession " + req.session.user_id);
+  console.log("Gparams " + req.params.user_id);
+
+  db.query(`
+  SELECT * FROM users;`)
+    .then(data => {
+      const templateVar = { users: data.rows, user_id: req.session.user_id };
+      //  console.log(templateVar);
+      if (templateVar.users[0].id === req.session.user_id) {
+        console.log("Already registered");
+        res.render("register");
+      } else {
+        console.log("Register new user");
+        res.render("register");
+      }
+    })
 });
 
 
