@@ -72,7 +72,7 @@ app.get("/api/users", (req, res) => {
   .catch((err) => console.log(err));
 });
 
-app.post("/api/users", (req, res) => {
+app.post("/register", (req, res) => {
   const {name, email, password} = req.body
   const sqlQuery = `
   INSERT INTO
@@ -85,6 +85,25 @@ app.post("/api/users", (req, res) => {
     .then(() => res.redirect("/quizzes"))
     .catch((err) => console.log(err));
 });
+
+// app.post("/new_quiz", (req, res) => {
+//   const {title, description, isPrivate} = req.body
+//   const user_id =
+//   const sqlQuery = `
+//   INSERT INTO
+//     quizzes(title, description, isPrivate)
+//   VALUES
+//     ($1, $2, $3, $4)
+//   RETURNING *
+//   `
+//   db.query(sqlQuery, [user_id, title, description, isPrivate])
+//     .then(() => )
+//     .catch((err) => console.log(err))
+// })
+
+// app.post("/new_question", (req, res) => {
+//   const
+// })
 
 
 

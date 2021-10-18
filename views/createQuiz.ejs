@@ -18,7 +18,7 @@
   <%- include('partials/header') %>
   <h1>Create Quiz 🥔</h1>
   <div class="quiz">
-  <form class="questions">
+  <form action="/new_quiz" method="POST" >
 
     <div class="container">
       <label for="title">Enter your title below:</label><br>
@@ -30,11 +30,22 @@
         <label for="exampleFormControlTextarea1">Add a short description of your quiz:</label>
         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
       </div>
+      <div class="container">
+        <input type="radio" name="is-private">
+        <label for="is-private">Would you like to make this quiz private?</label>
+      </div>
+    <div class="container">
+      <button type="submit" class="btn btn-primary">Add quiz</button>
     </div>
+    </div>
+    </form>
+
+
+    <form action="/new_question" method="POST">
 
       <div class="container">
         <label for="question1">Enter your question here:</label><br>
-        <input type="text" name="question1" placeholder="Question 1"><br><br>
+        <input type="text" name="question1" placeholder="Question...?"><br><br>
 
         <div class="answer">
           <label for="answer-btn">Enter your answers below, and select the correct answer:
@@ -42,20 +53,29 @@
             <input type="radio" name="answer-btn" id="answer1">
             <input type="text" name="input-answer" id="input-answer1" placeholder="Answer 1">
           </div>
+
           <div class="answers2">
             <input type="radio" name="answer-btn" id="answer2">
             <input type="text" name="input-answer" id="input-answer2" placeholder="Answer 2">
           </div>
+
           <div class="answers3">
             <input type="radio" name="answer-btn" id="answer3">
             <input type="text" name="input-answer" id="input-answer3" placeholder="Answer 3">
           </div>
+
           <div class="answers4">
             <input type="radio" name="answer-btn" id="answer4">
             <input type="text" name="input-answer" id="input-answer4" placeholder="Answer 4">
           </div>
+
+          <div class="container">
+            <button type="submit" class="btn btn-primary">Add Question</button>
+          </div>
         </label>
         </div>
+    </form>
+
 
 
 </body>
