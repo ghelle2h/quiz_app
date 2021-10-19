@@ -11,15 +11,26 @@
         <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/login">Login</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/register">Register</a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" href="/newquiz">Create New Quiz</a>
       </li>
     </ul>
     </div>
+
+    <ul>
+      <% if (user) { %>
+        Logged in as <%= user.name %>
+        <form class="form-inline" action="/logout" method="POST">
+          <div class="form-group mb-2">
+            <button type="submit" class="btn btn-outline-dark">Logout</button>
+          </div>
+        </form>
+      <% } else { %>
+          <a href="/login" class="btn btn-outline-dark">Login</a>
+
+          <a href="/register" class="btn btn-outline-dark">Register</a>
+
+          <% } %>
+    </ul>
+
     </nav>
 </header>

@@ -1,0 +1,84 @@
+From 153ae08091e9f41a4c7d3217c6e5042123249e6b Mon Sep 17 00:00:00 2001
+From: Tammy <tammyanndo@gmail.com>
+Date: Mon, 18 Oct 2021 13:58:36 -0400
+Subject: [PATCH 2/3] updated creat quiz ejs file to have 1 question and 4
+ answer inputs with radio buttons
+
+---
+ views/createQuiz.ejs | 52 +++++++++++++++++++++++---------------------
+ 1 file changed, 27 insertions(+), 25 deletions(-)
+
+diff --git a/views/createQuiz.ejs b/views/createQuiz.ejs
+index 237000b..b2c1a39 100644
+--- a/views/createQuiz.ejs
++++ b/views/createQuiz.ejs
+@@ -21,39 +21,41 @@
+   <form class="questions">
+ 
+     <div class="container">
+-      <input type="text" name="tite" placeholder="title">
+-    </div>
++      <label for="title">Enter your title below:</label><br>
++      <input type="text" name="tite" placeholder="Title">
++    </div><br>
+ 
+     <div class="container">
+       <div class="form-group">
+-        <label for="exampleFormControlTextarea1">Description</label>
++        <label for="exampleFormControlTextarea1">Add a short description of your quiz:</label>
+         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+       </div>
+     </div>
+ 
+       <div class="container">
+-        <input type="text" name="question1" placeholder="Question 1...?">
+-      </div>
+-
+-      <div class="container">
+-        <input type="text" name="question2" placeholder="Question 2...?">
+-      </div>
+-
+-      <div class="container">
+-        <input type="text" name="question3" placeholder="Question 3...?">
+-      </div>
+-
+-
+-  </form>
+-
+-  <form class="answers">
+-
+-    <input type="text" name="answer1" placeholder="Answer 1...?">
+-    <input type="text" name="answer2" placeholder="Answer 2...?">
+-    <input type="text" name="answer3" placeholder="Answer 3...?">
+-  </form>
+-  </div>
+-
++        <label for="question1">Enter your question here:</label><br>
++        <input type="text" name="question1" placeholder="Question 1"><br><br>
++
++        <div class="answer">
++          <label for="answer-btn">Enter your answers below, and select the correct answer:
++          <div class="answers1">
++            <input type="radio" name="answer-btn" id="answer1">
++            <input type="text" name="input-answer" id="input-answer1" placeholder="Answer 1">
++          </div>
++          <div class="answers2">
++            <input type="radio" name="answer-btn" id="answer2">
++            <input type="text" name="input-answer" id="input-answer2" placeholder="Answer 2">
++          </div>
++          <div class="answers3">
++            <input type="radio" name="answer-btn" id="answer3">
++            <input type="text" name="input-answer" id="input-answer3" placeholder="Answer 3">
++          </div>
++          <div class="answers4">
++            <input type="radio" name="answer-btn" id="answer4">
++            <input type="text" name="input-answer" id="input-answer4" placeholder="Answer 4">
++          </div>
++        </label>
++        </div>
+ 
+ 
+ </body>
+-- 
+2.30.1 (Apple Git-130)
+
