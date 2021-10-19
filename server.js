@@ -50,9 +50,8 @@ app.use("/api/widgets", widgetsRoutes(db));
 
 app.get("/api/quizzes", (req, res) => {
   const sqlQuery = `
-  SELECT quizzes.title, users.name
+  SELECT *
   FROM quizzes
-  JOIN users ON users.id = user_id
   ;
   `
   db.query(sqlQuery)
@@ -72,6 +71,8 @@ app.get("/api/users", (req, res) => {
   .catch((err) => console.log(err));
 });
 
+
+
 app.post("/register", (req, res) => {
   const {name, email, password} = req.body
   const sqlQuery = `
@@ -86,20 +87,30 @@ app.post("/register", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-// app.post("/new_quiz", (req, res) => {
-//   const {title, description, isPrivate} = req.body
-//   const user_id =
-//   const sqlQuery = `
-//   INSERT INTO
-//     quizzes(title, description, isPrivate)
-//   VALUES
-//     ($1, $2, $3, $4)
-//   RETURNING *
-//   `
-//   db.query(sqlQuery, [user_id, title, description, isPrivate])
-//     .then(() => )
-//     .catch((err) => console.log(err))
-// })
+app.post("/new_quiz", (req, res) => {
+  const {title, description, isPrivate, question, answer1, answer2, answer3, answer4 } = req.body
+  const sqlQuery = `
+  INSERT INTO
+    quizzes(title, description, isPrivate)
+  VALUES
+    ($1, $2, $3)
+  RETURNING *
+  `
+  db.query(sqlQuery, [title, description, isPrivate, question, answer1, answer2, answer3, answer4])
+    .then(() => {
+      const sqlQuery = `
+      INSERT INTO
+        quiz_questions(question, answer)
+      VALUES
+        ($1, $2), ($1, $3), ($1, $4), ($1, $5)
+      RETURNING *
+      `
+    db.query(sqlQuery, [question, answer1, answer2, answer3, answer4])
+      .then(() => res.redirect("/quizzes"))
+      .catch((err) => console.log(err))
+    })
+    .catch((err) => console.log(err))
+})
 
 // app.post("/new_question", (req, res) => {
 //   const
