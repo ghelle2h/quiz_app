@@ -7,7 +7,7 @@ const sassMiddleware = require("./lib/sass-middleware");
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
-const cookieSession = require("cookie-session");
+
 
 // PG database client/connection setup
 const { Pool } = require("pg");
@@ -21,8 +21,11 @@ db.connect();
 app.use(morgan("dev"));
 
 app.set("view engine", "ejs");
+const bodyParser = require("body-parser");
+const cookieSession = require("cookie-session");
 app.use(express.urlencoded({ extended: true }));
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
   keys: ['QUIZZAPP'],
@@ -80,30 +83,79 @@ app.get("/api/users", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-app.post("/register", (req, res) => {
-  const { name, email, password } = req.body
-  console.log("session " + req.session.user_id);
-  console.log("params " + req.params.user_id);
-  const gotEmail = req.body.email;
-  const gotPassword = req.body.password;
+const userEmailExists = function (email, templateVar) {
+  templateVar.users.forEach(element => {
+    //  console.log(element["email"]);
+    if (element["email"] === email) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+};
+/*
+const getSessionId = function (sqlQuery1, email) {
+  let session_id = db.query(sqlQuery1)
+    .then(data => {
+      const templateVar = { users: data.rows };
+      templateVar.users.forEach(element => {
+        console.log(element["email"], email, element["id"]);
+        if (element["email"] == email) {
+          console.log(element["id"]);
+          return element["id"];
+        }
+      });
+    })
 
-  if (!gotEmail || !gotPassword) {
+    .catch((err) => console.log(err))
+
+  return session_id;
+};
+*/
+app.post("/register", (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!email || !password) {
     res.status(400).send("Invalid email or password!");
   }
-  /*
-    if (userEmailExists(gotEmail, users)) {
-      res.status(400).send("Email is already registered!");
-    }
-  */
+  const sqlQuery1 = `SELECT * FROM users`;
   const sqlQuery = `
   INSERT INTO
     users(name, email, password)
   VALUES
     ($1, $2, $3)
   RETURNING *
-  `
-  db.query(sqlQuery, [name, email, password])
-    .then(() => res.redirect("/quizzes"))
+  `;
+
+  db.query(sqlQuery1)
+    .then(data => {
+      const templateVar = { users: data.rows, user_id: req.session.user_id };
+      console.log(templateVar);
+      if (userEmailExists(email, templateVar)) {
+        res.status(400).send("Email is already registered!");
+      } else {
+        db.query(sqlQuery, [name, email, password])
+          .then(data => {
+            //req.session.user_id = getSessionId(sqlQuery1, email);
+            db.query(sqlQuery1)
+              .then(data => {
+                const templateVar = { users: data.rows };
+                templateVar.users.forEach(element => {
+                  //       console.log(element["email"], email, element["id"]);
+                  if (element["email"] == email) {
+                    console.log(element["id"]);
+                    req.session.user_id = element["id"];
+                  }
+                });
+                console.log("POST got session " + req.session.user_id);
+                res.redirect("/quizzes");
+              })
+
+
+          })
+      }
+    }
+    )
     .catch((err) => console.log(err));
 });
 
@@ -177,25 +229,12 @@ const users = {
 };
 
 app.get("/register", (req, res) => {
-  console.log("Gsession " + req.session.user_id);
-  console.log("Gparams " + req.params.user_id);
-
   db.query(`
   SELECT * FROM users;`)
-    .then(data => {
-      const templateVar = { users: data.rows, user_id: req.session.user_id };
-      //  console.log(templateVar);
-      if (templateVar.users[0].id === req.session.user_id) {
-        console.log("Already registered");
-        res.render("register");
-      } else {
-        console.log("Register new user");
-        res.render("register");
-      }
+    .then(() => {
+      res.render("register");  //Only this line is relevant;
     })
 });
-
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
