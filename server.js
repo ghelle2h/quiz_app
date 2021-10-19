@@ -59,20 +59,62 @@ app.use("/api/widgets", widgetsRoutes(db));
 // Warning: avoid creating more routes in this file!
 // Separate them into separate routes files (see above).
 
+//HELPER FUNCTION (to be moved into helper folder)
+const confirmUser = function (email, password) {
+  return findUserByEmail(email)
+    .then(function (res) {
+      const userFound = res[0]
+      if (!userFound) {
+        return false
+      };
+      if (userFound) {
+        const result = (password === userFound.password)
+        if (!result) {
+          return false;
+        } else {
+          return userFound
+        }
+      }
+    })
+
+};
+
+const findUserByEmail = function (email) {
+  const sqlQuery = `
+    SELECT *
+    FROM users
+    WHERE email = $1;
+    `
+
+  return db.query(sqlQuery, [email])
+    .then((dbRes) => dbRes.rows)
+    .catch((err) => console.log(err));
+};
+
 app.get("/api/quizzes", (req, res) => {
   const sqlQuery = `
   SELECT *
   FROM quizzes
   ;
   `
+
   db.query(sqlQuery)
-    .then((dbRes) => res.json(dbRes.rows))
-    .catch((err) => console.log(err));
+    .then((dbRes) => {
+      const templateVars = {
+        user: {
+          name: undefined
+        },
+        quizzes: dbRes.rows
+      }
+      console.log("dbRes", dbRes)
+      res.render("index", templateVars)
+      console.log(dbRes.rows);
 
-});
+    });
+  });
 
-app.get("/api/users", (req, res) => {
-  const sqlQuery = `
+  app.get("/api/users", (req, res) => {
+    const sqlQuery = `
   SELECT *
   FROM users
   ;
@@ -160,83 +202,122 @@ app.post("/register", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-// app.post("/new_quiz", (req, res) => {
-//   const {title, description, isPrivate} = req.body
-//   const user_id =
-//   const sqlQuery = `
-//   INSERT INTO
-//     quizzes(title, description, isPrivate)
-//   VALUES
-//     ($1, $2, $3, $4)
-//   RETURNING *
-//   `
-//   db.query(sqlQuery, [user_id, title, description, isPrivate])
-//     .then(() => )
-//     .catch((err) => console.log(err))
-// })
+  // app.post("/new_quiz", (req, res) => {
+  //   const {title, description, isPrivate} = req.body
+  //   const user_id =
+  //   const sqlQuery = `
+  //   INSERT INTO
+  //     quizzes(title, description, isPrivate)
+  //   VALUES
+  //     ($1, $2, $3, $4)
+  //   RETURNING *
+  //   `
+  //   db.query(sqlQuery, [user_id, title, description, isPrivate])
+  //     .then(() => )
+  //     .catch((err) => console.log(err))
+  // })
 
-// app.post("/new_question", (req, res) => {
-//   const
-// })
+  // app.post("/new_question", (req, res) => {
+  //   const
+  // })
 
 
 
-app.get("/", (req, res) => {
+  app.get("/", (req, res) => {
 
-  res.redirect("/quizzes");
+    res.redirect("/quizzes");
 
-});
+  });
 
-app.get("/quizzes", (req, res) => {
-  const sqlQuery = `
+  app.get("/quizzes", (req, res) => {
+    const sqlQuery = `
   SELECT quizzes.title, users.name
   FROM quizzes
   JOIN users ON users.id = user_id
   ;
   `
 
-  db.query(sqlQuery)
-    .then((dbRes) => {
-      const templateVars = {
-        quizzes: dbRes.rows
-      }
-      res.render("index", templateVars)
-      console.log(dbRes.rows);
+    db.query(sqlQuery)
+      .then((dbRes) => {
+        console.log("req.session.user:", req.session.user_id)
+        const templateVars = {
+          quizzes: dbRes.rows,
+          user: req.session.user_id
+
+        }
+        res.render("index", templateVars)
+        console.log("deRes.rows:", dbRes.rows);
 
 
-    })
-    .catch((err) => console.log(err));
-})
+      })
+      .catch((err) => console.log(err));
+  })
 
 
-app.get("/newquiz", (req, res) => {
-  res.render("createQuiz");
-});
+  app.get("/newquiz", (req, res) => {
+    res.render("createQuiz");
+  });
 
-app.post("/newquiz"), (req, res) => {
+  app.post("/newquiz"), (req, res) => {
 
-}
-
-app.get("/login", (req, res) => {
-  res.render("login");
-});
-
-const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
   }
-};
 
-app.get("/register", (req, res) => {
-  db.query(`
-  SELECT * FROM users;`)
-    .then(() => {
-      res.render("register");  //Only this line is relevant;
+  app.get("/login", (req, res) => {
+    const user = null
+    const templateVars = {
+      user
+    }
+    res.render("login", templateVars);
+  });
+
+  app.post("/login", (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+
+    // use helper function to confirm that email is found in db, and if so, the password matches
+    confirmUser(email, password)
+    .then((user) => {
+      console.log("user:", user)
+          // if there is a user (true), then create a cookie, otherwise return error message
+    if (user) {
+      req.session.user_id = user;
+      res.redirect("/quizzes");
+    } else {
+      res.status(403).send('Status code 403: Login error. Please try again.');
+    }
     })
-});
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
-});
+  })
+
+  app.post("/logout", (req, res) => {
+    req.session = null;
+
+    res.redirect("/");
+  });
+
+  app.get("/register", (req, res) => {
+    console.log("Gsession " + req.session.user_id);
+    console.log("Gparams " + req.params.user_id);
+
+    db.query(`
+  SELECT * FROM users;`)
+      .then(data => {
+        const templateVar = { users: data.rows, user_id: req.session.user_id };
+        //  console.log(templateVar);
+        if (templateVar.users[0].id === req.session.user_id) {
+          console.log("Already registered");
+          res.render("register");
+        } else {
+          console.log("Register new user");
+          res.render("register");
+        }
+      })
+  });
+
+
+
+  app.listen(PORT, () => {
+    console.log(`Example app listening on port ${PORT}`);
+  });
+

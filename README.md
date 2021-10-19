@@ -1,4 +1,4 @@
-LHL Node Skeleton
+Quiz App
 =========
 
 ## Project Setup
