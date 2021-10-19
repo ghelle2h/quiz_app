@@ -8,6 +8,7 @@ const express = require("express");
 const app = express();
 const morgan = require("morgan");
 
+
 // PG database client/connection setup
 const { Pool } = require("pg");
 const dbParams = require("./lib/db.js");
@@ -20,7 +21,17 @@ db.connect();
 app.use(morgan("dev"));
 
 app.set("view engine", "ejs");
+const bodyParser = require("body-parser");
+const cookieSession = require("cookie-session");
 app.use(express.urlencoded({ extended: true }));
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['QUIZZAPP'],
+  maxAge: 24 * 60 * 60 * 1000,
+}));
+
 
 app.use(
   "/styles",
@@ -55,8 +66,8 @@ app.get("/api/quizzes", (req, res) => {
   ;
   `
   db.query(sqlQuery)
-  .then((dbRes) =>res.json(dbRes.rows))
-  .catch((err) => console.log(err));
+    .then((dbRes) => res.json(dbRes.rows))
+    .catch((err) => console.log(err));
 
 });
 
@@ -67,50 +78,102 @@ app.get("/api/users", (req, res) => {
   ;
   `
   db.query(sqlQuery)
-  .then((dbRes) =>res.json(dbRes.rows))
-  .catch((err) => console.log(err));
+    .then((dbRes) => res.json(dbRes.rows))
+    .catch((err) => console.log(err));
 });
 
+const userEmailExists = function (email, templateVar) {
+  templateVar.users.forEach(element => {
 
+     console.log(email)
+    if (element["email"] === email) {
+      return true;
+    }
+  });
+  return false;
+};
+/*
+const getSessionId = function (sqlQuery1, email) {
+  let session_id = db.query(sqlQuery1)
+    .then(data => {
+      const templateVar = { users: data.rows };
+      templateVar.users.forEach(element => {
+        console.log(element["email"], email, element["id"]);
+        if (element["email"] == email) {
+          console.log(element["id"]);
+          return element["id"];
+        }
+      });
+    })
 
+    .catch((err) => console.log(err))
+
+  return session_id;
+};
+*/
 app.post("/register", (req, res) => {
-  const {name, email, password} = req.body
+  const { name, email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).send("Invalid email or password!");
+  }
+
+  const sqlQuery1 = `SELECT * FROM users`;
   const sqlQuery = `
   INSERT INTO
     users(name, email, password)
   VALUES
     ($1, $2, $3)
   RETURNING *
-  `
-  db.query(sqlQuery, [name, email, password])
-    .then(() => res.redirect("/quizzes"))
+  `;
+
+  db.query(sqlQuery1)
+    .then(data => {
+      const templateVar = { users: data.rows, user_id: req.session.user_id };
+      console.log(templateVar);
+      console.log(email)
+      if (userEmailExists(email, templateVar)) {
+        res.status(400).send("Email is already registered!");
+      } else {
+        db.query(sqlQuery, [name, email, password])
+          .then(data => {
+            //req.session.user_id = getSessionId(sqlQuery1, email);
+            db.query(sqlQuery1)
+              .then(data => {
+                const templateVar = { users: data.rows };
+                templateVar.users.forEach(element => {
+                  //       console.log(element["email"], email, element["id"]);
+                  if (element["email"] == email) {
+                    console.log(element["id"]);
+                    req.session.user_id = element["id"];
+                  }
+                });
+                console.log("POST got session " + req.session.user_id);
+                res.redirect("/quizzes");
+              })
+
+
+          })
+      }
+    }
+    )
     .catch((err) => console.log(err));
 });
 
-app.post("/new_quiz", (req, res) => {
-  const {title, description, isPrivate, question, answer1, answer2, answer3, answer4 } = req.body
-  const sqlQuery = `
-  INSERT INTO
-    quizzes(title, description, isPrivate)
-  VALUES
-    ($1, $2, $3)
-  RETURNING *
-  `
-  db.query(sqlQuery, [title, description, isPrivate, question, answer1, answer2, answer3, answer4])
-    .then(() => {
-      const sqlQuery = `
-      INSERT INTO
-        quiz_questions(question, answer)
-      VALUES
-        ($1, $2), ($1, $3), ($1, $4), ($1, $5)
-      RETURNING *
-      `
-    db.query(sqlQuery, [question, answer1, answer2, answer3, answer4])
-      .then(() => res.redirect("/quizzes"))
-      .catch((err) => console.log(err))
-    })
-    .catch((err) => console.log(err))
-})
+// app.post("/new_quiz", (req, res) => {
+//   const {title, description, isPrivate} = req.body
+//   const user_id =
+//   const sqlQuery = `
+//   INSERT INTO
+//     quizzes(title, description, isPrivate)
+//   VALUES
+//     ($1, $2, $3, $4)
+//   RETURNING *
+//   `
+//   db.query(sqlQuery, [user_id, title, description, isPrivate])
+//     .then(() => )
+//     .catch((err) => console.log(err))
+// })
 
 // app.post("/new_question", (req, res) => {
 //   const
@@ -133,16 +196,16 @@ app.get("/quizzes", (req, res) => {
   `
 
   db.query(sqlQuery)
-  .then((dbRes) => {
-    const templateVars = {
-      quizzes: dbRes.rows
-    }
-    res.render("index", templateVars)
-    console.log(dbRes.rows);
+    .then((dbRes) => {
+      const templateVars = {
+        quizzes: dbRes.rows
+      }
+      res.render("index", templateVars)
+      console.log(dbRes.rows);
 
 
-  })
-  .catch((err) => console.log(err));
+    })
+    .catch((err) => console.log(err));
 })
 
 
@@ -158,11 +221,21 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  }
+};
+
 app.get("/register", (req, res) => {
-  res.render("register");
+  db.query(`
+  SELECT * FROM users;`)
+    .then(() => {
+      res.render("register");  //Only this line is relevant;
+    })
 });
-
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
