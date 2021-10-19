@@ -60,6 +60,8 @@ app.use("/api/widgets", widgetsRoutes(db));
 // Separate them into separate routes files (see above).
 
 //HELPER FUNCTION (to be moved into helper folder)
+let newQuiz = undefined;
+
 const confirmUser = function (email, password) {
   return findUserByEmail(email)
     .then(function (res) {
@@ -125,14 +127,17 @@ app.get("/api/quizzes", (req, res) => {
 });
 
 const userEmailExists = function (email, templateVar) {
-  templateVar.users.forEach(element => {
-
-     console.log(email)
-    if (element["email"] === email) {
+  // templateVar.users.forEach(element => {
+    for(let element of templateVar.users) {
+      if (element["email"] === email) {
+      console.log('true')
       return true;
     }
-  });
+    }
+  console.log('false')
   return false;
+
+
 };
 /*
 const getSessionId = function (sqlQuery1, email) {
@@ -202,25 +207,29 @@ app.post("/register", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-  // app.post("/new_quiz", (req, res) => {
-  //   const {title, description, isPrivate} = req.body
-  //   const user_id =
-  //   const sqlQuery = `
-  //   INSERT INTO
-  //     quizzes(title, description, isPrivate)
-  //   VALUES
-  //     ($1, $2, $3, $4)
-  //   RETURNING *
-  //   `
-  //   db.query(sqlQuery, [user_id, title, description, isPrivate])
-  //     .then(() => )
-  //     .catch((err) => console.log(err))
-  // })
+  app.post("/new_quiz", (req, res) => {
+    const {title, description, isPrivate} = req.body
+    console.log(req.body.title)
+    const user_id = req.session.user_id
+    console.log(user_id)
+    const sqlQuery = `
+    INSERT INTO
+      quizzes(user_id, title, description, isPrivate)
+    VALUES
+      ($1, $2, $3, $4)
+    RETURNING *
+    `
+    db.query(sqlQuery, [user_id, title, description, isPrivate])
+      .then((dbRes) => {
+        newQuiz = dbRes.rows[0].id
+
+      })
+      .catch((err) => console.log(err))
+  });
 
   // app.post("/new_question", (req, res) => {
   //   const
-  // })
-
+  // }
 
 
   app.get("/", (req, res) => {
@@ -255,12 +264,19 @@ app.post("/register", (req, res) => {
 
 
   app.get("/newquiz", (req, res) => {
-    res.render("createQuiz");
+    const user = null
+    const templateVars = {
+      user
+    }
+    res.render("createQuiz", templateVars);
   });
 
-  app.post("/newquiz"), (req, res) => {
+  // app.post("/newquiz"), (req, res) => {
 
-  }
+  // }
+  app.post(`/new_quiz/${newQuiz}`, (req, res) => {
+
+  })
 
   app.get("/login", (req, res) => {
     const user = null
@@ -281,7 +297,7 @@ app.post("/register", (req, res) => {
       console.log("user:", user)
           // if there is a user (true), then create a cookie, otherwise return error message
     if (user) {
-      req.session.user_id = user;
+      req.session.user_id = user.id;
       res.redirect("/quizzes");
     } else {
       res.status(403).send('Status code 403: Login error. Please try again.');
@@ -299,6 +315,10 @@ app.post("/register", (req, res) => {
   app.get("/register", (req, res) => {
     console.log("Gsession " + req.session.user_id);
     console.log("Gparams " + req.params.user_id);
+    const user = null
+    const templateVars = {
+      user
+    }
 
     db.query(`
   SELECT * FROM users;`)
@@ -310,7 +330,7 @@ app.post("/register", (req, res) => {
           res.render("register");
         } else {
           console.log("Register new user");
-          res.render("register");
+          res.render("register", templateVars);
         }
       })
   });

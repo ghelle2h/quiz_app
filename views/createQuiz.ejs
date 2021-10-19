@@ -22,24 +22,25 @@
 
     <div class="container">
       <label for="title">Enter your title below:</label><br>
-      <input type="text" name="tite" placeholder="Title">
+      <input type="text" name="title" placeholder="Title">
     </div><br>
 
     <div class="container">
       <div class="form-group">
-        <label for="exampleFormControlTextarea1">Add a short description of your quiz:</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        <label for="description">Add a short description of your quiz:</label>
+        <textarea class="form-control" id="description" rows="3"></textarea>
       </div>
       <div class="container">
-        <input type="radio" name="is-private">
-        <label for="is-private">Would you like to make this quiz private?</label>
+        <input type="radio" name="isPrivate">
+        <label for="isPrivate">Would you like to make this quiz private?</label>
       </div>
     <div class="container">
       <button type="submit" class="btn btn-primary">Add quiz</button>
     </div>
     </div>
-
-      <div class="container">
+  </form>
+  <form action="/new_quiz/:quiz_id" method="POST">
+    <div class="container">
         <label for="question">Enter your question here:</label><br>
         <input type="text" name="question" placeholder="Question...?"><br><br>
 
@@ -70,7 +71,10 @@
           </div>
         </label>
         </div>
-    </form>
+  </form>
+
+
+
 
 
 
