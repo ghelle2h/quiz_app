@@ -207,7 +207,7 @@ app.post("/register", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-  app.post("/new_quiz", (req, res) => {
+  app.post("/newquiz", (req, res) => {
     const {title, description, isPrivate} = req.body
     console.log(req.body.title)
     const user_id = req.session.user_id
@@ -221,7 +221,35 @@ app.post("/register", (req, res) => {
     `
     db.query(sqlQuery, [user_id, title, description, isPrivate])
       .then((dbRes) => {
-        newQuiz = dbRes.rows[0].id
+        const {question} = req.body
+        const newQuizId = dbRes.rows[0].id
+        const sqlQuery1 = `
+        INSERT INTO
+         quiz_questions(quiz_id, question)
+        VALUES
+          ($1, $2)
+        RETURNING *
+        ;
+        `
+        db.query(sqlQuery1, [newQuizId, question])
+          .then((dbRes) => {
+            const {answer1, answer2, answer3, answer4} = req.body
+            const newQuestionId = dbRes.rows[0].id
+            const sqlQuery2 = `
+            INSERT INTO
+              quiz_answers(question_id, answer)
+            VALUES
+              ($1, $2), ($1, $3), ($1, $4), ($1, $5)
+            RETURNING *
+            ;
+            `
+          db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
+            .then(() => {
+              res.redirect("/quizzes")
+            })
+          })
+          .catch((err) => console.log(err))
+
 
       })
       .catch((err) => console.log(err))
@@ -274,9 +302,33 @@ app.post("/register", (req, res) => {
   // app.post("/newquiz"), (req, res) => {
 
   // }
-  app.post(`/new_quiz/${newQuiz}`, (req, res) => {
 
+  app.get("/api/quiz/:quiz_id", (req, res) => {
+    const sqlQuery = `
+    SELECT * FROM quiz_questions
+    JOIN quizzes ON quizzes.id = quiz_id
+    WHERE quiz_id = 4;
+    `
+    db.query(sqlQuery)
+      .then((dbRes) => res.json(dbRes.rows))
+      .catch((err) => console.log(err))
   })
+  // app.post(`/new_quiz/${newQuiz}`, (req, res) => {
+  //   const {question, answer1, answer2, answer3, answer4} = req.body
+  //   const sqlQuery = `
+  //   INSERT INTO
+  //     quiz_questions(quiz_id, question, answer)
+  //   VALUES
+  //     ($1, $2, $3), ($1, $2, $4), ($1, $2, $5)
+  //   RETURNING *
+  //   ;
+  //   `
+  //   db.query(sqlQuery, [newQuiz, question, answer1, answer2, answer3, answer4])
+  //     .then(() => res.redirect("/api/newquiz"))
+  //     .catch((err) => console.log(err))
+  // })
+
+  // app.get("/new_quiz/:quiz_id")
 
   app.get("/login", (req, res) => {
     const user = null
