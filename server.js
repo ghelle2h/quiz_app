@@ -300,12 +300,17 @@ app.post("/register", (req, res) => {
 
 
   app.get("/", (req, res) => {
+    const user = req.session.user_id
+    const templateVars = {
+      user
+    }
 
-    res.redirect("/quizzes");
+    res.redirect("/quizzes", templateVars);
 
   });
 
   app.get("/quizzes", (req, res) => {
+
     const sqlQuery = `
   SELECT quizzes.title, users.name
   FROM quizzes
@@ -404,9 +409,7 @@ app.post("/register", (req, res) => {
   });
 
   app.get("/register", (req, res) => {
-    console.log("Gsession " + req.session.user_id);
-    console.log("Gparams " + req.params.user_id);
-    const user = null
+    const user = req.session.user_id
     const templateVars = {
       user
     }
