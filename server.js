@@ -374,12 +374,6 @@ app.post("/register", (req, res) => {
     const templateVars = {
       user
     }
-    console.log("Gsession " + req.session.user_id);
-    console.log("Gparams " + req.params.user_id);
-    const user = null
-    const templateVars = {
-      user
-    }
 
     db.query(`
   SELECT * FROM users;`)
