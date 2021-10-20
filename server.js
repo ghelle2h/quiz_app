@@ -223,12 +223,17 @@ app.post("/register", (req, res) => {
 
 
   app.get("/", (req, res) => {
+    const user = req.session.user_id
+    const templateVars = {
+      user
+    }
 
-    res.redirect("/quizzes");
+    res.redirect("/quizzes", templateVars);
 
   });
 
   app.get("/quizzes", (req, res) => {
+
     const sqlQuery = `
   SELECT quizzes.title, users.name
   FROM quizzes
@@ -254,10 +259,16 @@ app.post("/register", (req, res) => {
 
 
   app.get("/newquiz", (req, res) => {
-    res.render("createQuiz");
+    const user = req.session.user_id
+    const templateVars = {
+      user
+    }
+    res.render("createQuiz", templateVars);
   });
 
   app.post("/newquiz"), (req, res) => {
+
+
 
   }
 
@@ -296,6 +307,10 @@ app.post("/register", (req, res) => {
   });
 
   app.get("/register", (req, res) => {
+    const user = req.session.user_id
+    const templateVars = {
+      user
+    }
     console.log("Gsession " + req.session.user_id);
     console.log("Gparams " + req.params.user_id);
 
@@ -309,7 +324,7 @@ app.post("/register", (req, res) => {
           res.render("register");
         } else {
           console.log("Register new user");
-          res.render("register");
+          res.render("register", templateVars);
         }
       })
   });
