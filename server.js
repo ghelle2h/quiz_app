@@ -60,7 +60,8 @@ app.use("/api/widgets", widgetsRoutes(db));
 // Separate them into separate routes files (see above).
 
 //HELPER FUNCTION (to be moved into helper folder)
-let newQuiz = undefined;
+let newQuizId = undefined;
+let newQuestionId = undefined;
 
 const confirmUser = function (email, password) {
   return findUserByEmail(email)
@@ -221,8 +222,33 @@ app.post("/register", (req, res) => {
     `
     db.query(sqlQuery, [user_id, title, description, isPrivate])
       .then((dbRes) => {
-        const {question} = req.body
-        const newQuizId = dbRes.rows[0].id
+      //   const {question} = req.body
+        newQuizId = dbRes.rows[0].id
+        res.redirect(`/new_question/${newQuizId}`)
+          })
+          .catch((err) => console.log(err))
+
+
+      });
+
+      app.get("/new_question/:quiz_id", (req, res) =>{
+        const user = null
+        const quiz_id = req.params.quiz_id
+    const templateVars = {
+      user,
+      quiz_id
+    }
+    // console.log(quiz_id);
+
+        res.render("quiz_questions", templateVars);
+      })
+
+
+  app.post("/new_question/:quiz_id", (req, res) => {
+    const {question, quiz_id} = req.body
+
+    console.log("quiz_id server side: ", quiz_id)
+
         const sqlQuery1 = `
         INSERT INTO
          quiz_questions(quiz_id, question)
@@ -231,30 +257,43 @@ app.post("/register", (req, res) => {
         RETURNING *
         ;
         `
-        db.query(sqlQuery1, [newQuizId, question])
-          .then((dbRes) => {
+    db.query(sqlQuery1, [quiz_id, question])
+      .then((dbRes) => {
+        newQuestionId = dbRes.rows[0].id;
             const {answer1, answer2, answer3, answer4} = req.body
-            const newQuestionId = dbRes.rows[0].id
             const sqlQuery2 = `
-            INSERT INTO
-              quiz_answers(question_id, answer)
-            VALUES
-              ($1, $2), ($1, $3), ($1, $4), ($1, $5)
-            RETURNING *
-            ;
-            `
-          db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
-            .then(() => {
-              res.redirect("/quizzes")
-            })
-          })
-          .catch((err) => console.log(err))
+              INSERT INTO
+                  quiz_answers(question_id, answer)
+                    VALUES
+                      ($1, $2), ($1, $3), ($1, $4), ($1, $5)
+                    RETURNING *
+                    ;
+                    `
+                  db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
+                    .then((dbRes) => {
+                      console.log(dbRes.rows[0])
+                    })
+          });
+    res.send();
 
+  })
 
-      })
-      .catch((err) => console.log(err))
-  });
-
+  app.post(`/new_answers/:question_id`, (req, res) => {
+    console.log(req.params)
+    // const {answer1, answer2, answer3, answer4} = req.body
+    //         const sqlQuery2 = `
+    //         INSERT INTO
+    //           quiz_answers(question_id, answer)
+    //         VALUES
+    //           ($1, $2), ($1, $3), ($1, $4), ($1, $5)
+    //         RETURNING *
+    //         ;
+    //         `
+    //       db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
+    //         .then((dbRes) => {
+    //           console.log(dbRes.rows[0])
+    //         })
+  })
   // app.post("/new_question", (req, res) => {
   //   const
   // }
@@ -387,9 +426,23 @@ app.post("/register", (req, res) => {
       })
   });
 
+  app.get("/:quiz_id", (req, res) => {
+    db
+    res.render("quiz", templateVars);
+  });
+
+
+
+  app.get("/:user_id/:quiz_id/results", (req, res) => {
+    res.render("results")
+  })
 
 
   app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
   });
+
+  // SELECT title, description, id
+  // midterm-> FROM quizzes
+  // midterm-> WHERE id = 2;
 
