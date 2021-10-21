@@ -315,11 +315,12 @@ app.post("/register", (req, res) => {
 
 
   app.get("/newquiz", (req, res) => {
-<<<<<<< HEAD
-    const user = req.session.id
-=======
-    const user = req.session.user_id
->>>>>>> 5b50e0d9b221c2afdc20e51e5b8dbe4244c45a06
+    if(req.session.user_id) {
+      const user = req.session.user_id
+    } else {
+      user = null
+    }
+
     const templateVars = {
       user
     }
