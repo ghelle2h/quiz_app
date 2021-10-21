@@ -444,10 +444,15 @@ app.post("/register", (req, res) => {
       .then((dbRes) => {
        const templateVars = {
          questions: dbRes.rows,
-         user: {
-           id: req.session.user_id,
-           name: req.session.user_name
-       }
+         quizzes: dbRes.rows
+       };
+       if (req.session.user_id && req.session.user_name) {
+        templateVars['user'] = {
+          id: req.session.user_id,
+          name: req.session.user_name
+          }
+      } else {
+        templateVars['user'] = null;
       }
        res.render("quiz", templateVars);
       })
