@@ -2,7 +2,7 @@
 $(() => {
   $('#new_question').on('submit', (evt) => {
     evt.preventDefault();
-    evt.stopImmediatePropagation()
+    evt.stopImmediatePropagation();
     const question = $("#question").val()
 
     const answer1 = $("#input_answer1").val()

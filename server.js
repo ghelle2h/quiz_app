@@ -153,9 +153,7 @@ const getSessionId = function (sqlQuery1, email) {
         }
       });
     })
-
     .catch((err) => console.log(err))
-
   return session_id;
 };
 */
@@ -253,7 +251,6 @@ app.post("/new_question/:quiz_id", (req, res) => {
         VALUES
           ($1, $2)
           RETURNING *
-
         ;
         `
   db.query(sqlQuery1, [quiz_id, question])
@@ -292,8 +289,6 @@ app.get("/quizzes", (req, res) => {
   const sqlQuery = `
   SELECT quizzes.title
   FROM quizzes
-
-
   ;
   `
   const values = [req.session.user_id]
@@ -315,20 +310,17 @@ app.get("/quizzes", (req, res) => {
 })
 
 
-  app.get("/newquiz", (req, res) => {
-
-
-    if(req.session.user_id) {
-      const user = req.session.user_id
-    } else {
-      user = null
-    }
+app.get("/newquiz", (req, res) => {
+  if(req.session.user_id) {
+    const user = req.session.user_id
+  } else {
+    user = null
+  }
 const templateVars = {
-      user
-    }
-
-    res.render("createQuiz", templateVars);
-  });
+    user
+  }
+  res.render("createQuiz", templateVars);
+});
 
 // app.post("/newquiz"), (req, res) => {
 
@@ -484,4 +476,3 @@ app.listen(PORT, () => {
   // SELECT title, description, id
   // midterm-> FROM quizzes
   // midterm-> WHERE id = 2;
-
