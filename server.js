@@ -301,11 +301,8 @@ app.post("/register", (req, res) => {
 
   app.get("/", (req, res) => {
     const user = req.session.user_id
-    const templateVars = {
-      user
-    }
 
-    res.redirect("/quizzes", templateVars);
+    res.redirect("/quizzes");
 
   });
 
