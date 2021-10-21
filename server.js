@@ -252,6 +252,7 @@ app.post("/register", (req, res) => {
          quiz_questions(quiz_id, question)
         VALUES
           ($1, $2)
+        RETURNING *
 
         ;
         `
@@ -315,12 +316,16 @@ app.post("/register", (req, res) => {
 
 
   app.get("/newquiz", (req, res) => {
+<<<<<<< HEAD
     if(req.session.user_id) {
       const user = req.session.user_id
     } else {
       user = null
     }
 
+=======
+    const user = req.session.user_id
+>>>>>>> d5802c70389aca11c243fdf7a2e468fc54f907f1
     const templateVars = {
       user
     }
