@@ -17,10 +17,9 @@
 <body>
   <%- include('partials/header') %>
 <div class="container">
-  <form action="/new_question/<%= quiz_id%>" method="POST" id="new_question" >
+  <form id="new_question" >
      <label for="question">Enter your question here:</label><br>
      <input type="text" name="question" placeholder="Question...?" id="question"><br><br>
-
     <div class="answer">
     <label for="answer-btn">Enter your answers below, and select the correct answer:
     <div class="answers1">
@@ -45,6 +44,9 @@
 
     <div class="container">
       <button type="submit" class="btn btn-primary" >Add Answers</button>
+    </div>
+    <div class="container">
+      <button onclick="location.href = '/quizzes';" id="done">Done</button>
     </div>
   </label>
   <button type="submit" class="btn btn-primary" id="create_quiz">Create your quiz</button>

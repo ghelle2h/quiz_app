@@ -2,7 +2,7 @@
 $(() => {
   $('#new_question').on('submit', (evt) => {
     evt.preventDefault();
-    // $.post("/new_question/1");
+    evt.stopImmediatePropagation()
     const question = $("#question").val()
 
     const answer1 = $("#input_answer1").val()
@@ -23,9 +23,9 @@ $(() => {
       answer4: answer4,
       quiz_id: quiz_id
     };
-console.log("quiz_id:", quiz_id);
+
     $.ajax({
-      url: `/new_question/${questionList.quiz_id}`,
+      url: `/new_question/${quiz_id}`,
       method: 'POST',
       data: questionList
     })

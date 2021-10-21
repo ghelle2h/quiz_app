@@ -16,31 +16,22 @@
 
   <body>
     <%- include('partials/header') %>
-    <div>
-      <!-- DISPLAY QUIZ TITLE -->
-      <%= quiz.title %>
-      <!-- DISPLAY QUIZ DESCRIPTION -->
-      <%= quiz.description %>
-    </div>
 
     <div>
       <!-- DISPLAY QUIZ QUESTION WITH ANSWERS -->
-      <% for (let question in questions) { %>
+      <% for (let question of questions) { %>
+        <div class="container">
+          <label> <%= question.question %></label>
+        </div>
 
-        <label> <%= questions[question].question %></label>
 
-        <input id=" <%= questions[question].answer1 > + <%= questions[question].id %>" value= '<%= questions[question].answer1 %>'>
-        <label for="<%= questions[question].answer1 > + <%= questions[question].id %>"> <%= questions[question].answer1 %> </label>
+        <% for(let answer of question.answers) { %>
+          <div class="container">
+          <input type="radio">
+           <input  value= '<%= answer %>'>
+          </div>
 
-        <input id=" <%= questions[question].answer2 > + <%= questions[question].id %>" value= '<%= questions[question].answer2 %>'>
-        <label for="<%= questions[question].answer2 > + <%= questions[question].id %>"> <%= questions[question].answer2 %> </label>
-
-        <input id=" <%= questions[question].answer3 > + <%= questions[question].id %>" value= '<%= questions[question].answer3 %>'>
-        <label for="<%= questions[question].answer3 > + <%= questions[question].id %>"> <%= questions[question].answer3 %> </label>
-
-        <input id=" <%= questions[question].answer4 > + <%= questions[question].id %>" value= '<%= questions[question].answer4 %>'>
-        <label for="<%= questions[question].answer4 > + <%= questions[question].id %>"> <%= questions[question].answer4 %> </label>
-
+        <% } %>
       <% } %>
     </div>
 
