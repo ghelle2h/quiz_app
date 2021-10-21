@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <title>Result</title>
+
+    <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
+    <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/main.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+
+    <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
+    <script type="text/javascript" src="/scripts/app.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  </head>
+
+  <body>
+    <%- include('partials/header') %>
+
+    <label> <%= name %> &#8217 s results for <%= title %> </label>
+
+    <!-- SCORE PULLED FROM QUIZ DB; CSS TO MAKE BIGGER -->
+    <label> <%= score %> </label>
+
+    <!-- LINK TO SHARE RESULT -->
+    <label> <%= Copy this link to share your results: localhost:8080/<%=:quiz_attempt_id%> </label>
+
+    </body>

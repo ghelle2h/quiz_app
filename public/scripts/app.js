@@ -38,7 +38,11 @@ $(() => {
     console.log("running");
     })
     .catch((err) => console.log(err.message));
+<<<<<<< HEAD
 
   })
 
+=======
+});
+>>>>>>> 5b50e0d9b221c2afdc20e51e5b8dbe4244c45a06
 })

@@ -232,7 +232,7 @@ app.post("/register", (req, res) => {
       });
 
       app.get("/new_question/:quiz_id", (req, res) =>{
-        const user = null
+        const user = req.session.user_id
         const quiz_id = req.params.quiz_id
     const templateVars = {
       user,
@@ -282,12 +282,6 @@ app.post("/register", (req, res) => {
 
 
   app.get("/", (req, res) => {
-    // console.log('req.session', req.session)
-    // const user = req.session.user_id
-
-    // const templateVars = {
-    //   user
-    // }
 
     res.redirect("/quizzes");
   });
@@ -297,15 +291,13 @@ app.post("/register", (req, res) => {
     const sqlQuery = `
   SELECT quizzes.title
   FROM quizzes
-  WHERE user_id = $1
+
+
   ;
   `
     const values = [req.session.user_id]
-    db.query(sqlQuery, values)
+    db.query(sqlQuery)
       .then((dbRes) => {
-        console.log("req.session.user_name:", req.session.user_name)
-        console.log("req.session.user:", req.session.user_id)
-        console.log("dbRes:", dbRes.rows)
         const templateVars = {
           quizzes: dbRes.rows,
           user: {
@@ -323,7 +315,11 @@ app.post("/register", (req, res) => {
 
 
   app.get("/newquiz", (req, res) => {
+<<<<<<< HEAD
     const user = req.session.id
+=======
+    const user = req.session.user_id
+>>>>>>> 5b50e0d9b221c2afdc20e51e5b8dbe4244c45a06
     const templateVars = {
       user
     }
