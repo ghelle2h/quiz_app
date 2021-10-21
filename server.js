@@ -283,31 +283,43 @@ app.post("/register", (req, res) => {
 
 
   app.get("/", (req, res) => {
+<<<<<<< HEAD
     const user = req.session.user_id
     // const templateVars = {
     //   user
     // }
+=======
+    // console.log('req.session', req.session)
+    // const user = req.session.user_id
+>>>>>>> 6b6ec25ad8c2e9ea8b6fcc0469fc8d72d70e584b
 
-    res.redirect("/quizzes", templateVars);
+    // const templateVars = {
+    //   user
+    // }
 
+    res.redirect("/quizzes");
   });
 
   app.get("/quizzes", (req, res) => {
 
     const sqlQuery = `
-  SELECT quizzes.title, users.name
+  SELECT quizzes.title
   FROM quizzes
-  JOIN users ON users.id = user_id
+  WHERE user_id = $1
   ;
   `
-
-    db.query(sqlQuery)
+    const values = [req.session.user_id]
+    db.query(sqlQuery, values)
       .then((dbRes) => {
+        console.log("req.session.user_name:", req.session.user_name)
         console.log("req.session.user:", req.session.user_id)
+        console.log("dbRes:", dbRes.rows)
         const templateVars = {
           quizzes: dbRes.rows,
-          user: req.session.user_id
-
+          user: {
+          id: req.session.user_id,
+          name: req.session.user_name
+          }
         }
         res.render("index", templateVars)
         console.log("deRes.rows:", dbRes.rows);
@@ -377,6 +389,7 @@ app.post("/register", (req, res) => {
           // if there is a user (true), then create a cookie, otherwise return error message
     if (user) {
       req.session.user_id = user.id;
+      req.session.user_name = user.name
       res.redirect("/quizzes");
     } else {
       res.status(403).send('Status code 403: Login error. Please try again.');

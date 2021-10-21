@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <title>Quiz</title>
+
+    <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
+    <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/main.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+
+    <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
+    <script type="text/javascript" src="/scripts/app.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  </head>
+
+  <body>
+    <%- include('partials/header') %>
+    <div>
+      <!-- DISPLAY QUIZ TITLE -->
+      <%= quiz.title %>
+      <!-- DISPLAY QUIZ DESCRIPTION -->
+      <%= quiz.description %>
+    </div>
+
+    <div>
+      <!-- DISPLAY QUIZ QUESTION WITH ANSWERS -->
+      <% for (let question in questions) { %>
+
+        <label> <%= questions[question].question %></label>
+
+        <input id=" <%= questions[question].answer1 > + <%= questions[question].id %>" value= '<%= questions[question].answer1 %>'>
+        <label for="<%= questions[question].answer1 > + <%= questions[question].id %>"> <%= questions[question].answer1 %> </label>
+
+        <input id=" <%= questions[question].answer2 > + <%= questions[question].id %>" value= '<%= questions[question].answer2 %>'>
+        <label for="<%= questions[question].answer2 > + <%= questions[question].id %>"> <%= questions[question].answer2 %> </label>
+
+        <input id=" <%= questions[question].answer3 > + <%= questions[question].id %>" value= '<%= questions[question].answer3 %>'>
+        <label for="<%= questions[question].answer3 > + <%= questions[question].id %>"> <%= questions[question].answer3 %> </label>
+
+        <input id=" <%= questions[question].answer4 > + <%= questions[question].id %>" value= '<%= questions[question].answer4 %>'>
+        <label for="<%= questions[question].answer4 > + <%= questions[question].id %>"> <%= questions[question].answer4 %> </label>
+
+      <% } %>
+    </div>
+
+    <div>
+      <!-- BUTTON TO SUBMIT QUIZ (REDIRECT TO RESULTS PAGE)-->
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+
+
+  </body>
