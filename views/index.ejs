@@ -2,8 +2,10 @@
   <%- include('partials/header') %>
 
 <body>
-  <% for(let quiz of quizzes) { %>
-    <a><%= quiz.title %></a>
+  <% for(let quiz of quizzes) {
+    console.log("quiz:", quiz);
+    %>
+    <a href="/quizzes/<%= quiz.id %>"><%= quiz.title %></a>
     <% } %>
 
 

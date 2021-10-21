@@ -435,6 +435,18 @@ app.get("/register", (req, res) => {
   });
 
   app.post("/:quiz_id", (req, res) =>{
+    const user_id = req.session.user_id
+    const quiz_id = req.params.quiz_id
+    const {isCorrect} = req.body
+    const sqlQuery = `
+    INSERT
+      (user_id, quiz_id, isCorrect)
+    VALUES
+      ($1, $2, $3)
+    RETURNING *
+    ;
+    `
+    db.query(sqlQuery, [user_id, quiz_id, isCorrect])
 
   })
 

@@ -33,7 +33,7 @@
     </div>
 
     <ul>
-      <% if (user && user.name) { %>
+      <% if (user) { %>
         Logged in as <%= user.name %>
         <form class="form-inline" action="/logout" method="POST">
           <div class="form-group mb-2">
