@@ -317,13 +317,8 @@ app.get("/quizzes", (req, res) => {
 
   app.get("/newquiz", (req, res) => {
 
-
-    if(req.session.user_id) {
-      const user = req.session.user_id
-    } else {
-      user = null
-    }
-const templateVars = {
+    const user = req.session.user_id
+    const templateVars = {
       user
     }
 
@@ -439,6 +434,10 @@ app.get("/register", (req, res) => {
 
   });
 
+  app.post("/:quiz_id", (req, res) =>{
+
+  })
+
 
 
 /*
@@ -472,7 +471,7 @@ app.get("/:quiz_attempt_id/results", (req, res) => {
         score: templateVar["attempt"].length
       };
       console.log(templateVar1);
-      // res.render("result", templateVar);
+      res.render("result", templateVar1);
     })
 
 })
