@@ -252,7 +252,7 @@ app.post("/register", (req, res) => {
          quiz_questions(quiz_id, question)
         VALUES
           ($1, $2)
-        RETURNING *
+          RETURNING *
 
         ;
         `
@@ -316,19 +316,17 @@ app.post("/register", (req, res) => {
 
 
   app.get("/newquiz", (req, res) => {
-<<<<<<< HEAD
+
+
     if(req.session.user_id) {
       const user = req.session.user_id
     } else {
       user = null
     }
-
-=======
-    const user = req.session.user_id
->>>>>>> d5802c70389aca11c243fdf7a2e468fc54f907f1
-    const templateVars = {
+const templateVars = {
       user
     }
+
     res.render("createQuiz", templateVars);
   });
 
@@ -422,15 +420,23 @@ app.post("/register", (req, res) => {
   app.get("/:quiz_id", (req, res) => {
     const quiz_id = req.params.quiz_id
     const sqlQuery = `
-    SELECT quizzes.title, quizzes.description, quiz_questions.question, quizzes.id as quiz_id, answer
+    SELECT quizzes.title, quizzes.description, quiz_questions.question, quizzes.id as quiz_id, ARRAY_AGG (answer) as answers
     FROM quizzes
     INNER JOIN quiz_questions ON quiz_questions.quiz_id = quizzes.id
     INNER JOIN quiz_answers ON quiz_answers.question_id = quiz_questions.id
-    WHERE quiz_id = ($1)
+    WHERE quiz_id = $1
+    GROUP BY quizzes.title, quizzes.description, quizzes.id, quiz_questions.question
     ;
     `
     db.query(sqlQuery, [quiz_id])
-    res.render("quiz", templateVars);
+      .then((dbRes) => {
+       const templateVars = {
+         questions: dbRes.rows,
+         user: req.session.user_id
+       }
+       res.render("quiz", templateVars);
+      })
+
   });
 
 
