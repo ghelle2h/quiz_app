@@ -247,18 +247,17 @@ app.post("/register", (req, res) => {
   app.post("/new_question/:quiz_id", (req, res) => {
     const {question, quiz_id} = req.body
 
-    console.log("quiz_id server side: ", quiz_id)
-
         const sqlQuery1 = `
         INSERT INTO
          quiz_questions(quiz_id, question)
         VALUES
           ($1, $2)
-        RETURNING *
+
         ;
         `
     db.query(sqlQuery1, [quiz_id, question])
       .then((dbRes) => {
+        console.log(dbRes.rows[0])
         newQuestionId = dbRes.rows[0].id;
             const {answer1, answer2, answer3, answer4} = req.body
             const sqlQuery2 = `
@@ -271,7 +270,7 @@ app.post("/register", (req, res) => {
                     `
                   db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
                     .then((dbRes) => {
-                      console.log(dbRes.rows[0])
+                      // console.log(dbRes.rows[0])
 
                     })
           });
@@ -283,15 +282,8 @@ app.post("/register", (req, res) => {
 
 
   app.get("/", (req, res) => {
-<<<<<<< HEAD
-    const user = req.session.user_id
-    // const templateVars = {
-    //   user
-    // }
-=======
     // console.log('req.session', req.session)
     // const user = req.session.user_id
->>>>>>> 6b6ec25ad8c2e9ea8b6fcc0469fc8d72d70e584b
 
     // const templateVars = {
     //   user
@@ -331,7 +323,7 @@ app.post("/register", (req, res) => {
 
 
   app.get("/newquiz", (req, res) => {
-    const user = null
+    const user = req.session.id
     const templateVars = {
       user
     }
@@ -370,7 +362,7 @@ app.post("/register", (req, res) => {
   // app.get("/new_quiz/:quiz_id")
 
   app.get("/login", (req, res) => {
-    const user = null
+    const user = req.session.user_id
     const templateVars = {
       user
     }
@@ -426,7 +418,16 @@ app.post("/register", (req, res) => {
   });
 
   app.get("/:quiz_id", (req, res) => {
-    db.
+    const quiz_id = req.params.quiz_id
+    const sqlQuery = `
+    SELECT quizzes.title, quizzes.description, quiz_questions.question, quizzes.id as quiz_id, answer
+    FROM quizzes
+    INNER JOIN quiz_questions ON quiz_questions.quiz_id = quizzes.id
+    INNER JOIN quiz_answers ON quiz_answers.question_id = quiz_questions.id
+    WHERE quiz_id = ($1)
+    ;
+    `
+    db.query(sqlQuery, [quiz_id])
     res.render("quiz", templateVars);
   });
 
