@@ -272,38 +272,21 @@ app.post("/register", (req, res) => {
                   db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
                     .then((dbRes) => {
                       console.log(dbRes.rows[0])
+
                     })
           });
     res.send();
 
   })
 
-  app.post(`/new_answers/:question_id`, (req, res) => {
-    console.log(req.params)
-    // const {answer1, answer2, answer3, answer4} = req.body
-    //         const sqlQuery2 = `
-    //         INSERT INTO
-    //           quiz_answers(question_id, answer)
-    //         VALUES
-    //           ($1, $2), ($1, $3), ($1, $4), ($1, $5)
-    //         RETURNING *
-    //         ;
-    //         `
-    //       db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
-    //         .then((dbRes) => {
-    //           console.log(dbRes.rows[0])
-    //         })
-  })
-  // app.post("/new_question", (req, res) => {
-  //   const
-  // }
+
 
 
   app.get("/", (req, res) => {
     const user = req.session.user_id
-    const templateVars = {
-      user
-    }
+    // const templateVars = {
+    //   user
+    // }
 
     res.redirect("/quizzes", templateVars);
 
@@ -430,7 +413,7 @@ app.post("/register", (req, res) => {
   });
 
   app.get("/:quiz_id", (req, res) => {
-    db
+    db.
     res.render("quiz", templateVars);
   });
 

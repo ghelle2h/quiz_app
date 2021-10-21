@@ -25,7 +25,7 @@ $(() => {
     };
 console.log("quiz_id:", quiz_id);
     $.ajax({
-      url: `/new_question/${questionList.quiz_id}`,
+      url: `/new_question/${quiz_id}`,
       method: 'POST',
       data: questionList
     })
