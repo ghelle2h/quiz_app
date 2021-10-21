@@ -2,9 +2,8 @@
 $(() => {
   $('#new_question').on('submit', (evt) => {
     evt.preventDefault();
-    evt.stopImmediatePropagation();
+    evt.stopImmediatePropagation()
     const question = $("#question").val()
-
     const answer1 = $("#input_answer1").val()
     console.log(answer1);
     const answer2 = $("#input_answer2").val()
@@ -14,7 +13,6 @@ $(() => {
     const answer4 = $("#input_answer4").val()
     console.log(answer4);
     const quiz_id = $("#quiz_id").html();
-
     const questionList = {
       question: question,
       answer1: answer1,
@@ -23,7 +21,6 @@ $(() => {
       answer4: answer4,
       quiz_id: quiz_id
     };
-
     $.ajax({
       url: `/new_question/${quiz_id}`,
       method: 'POST',

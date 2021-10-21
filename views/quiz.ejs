@@ -19,15 +19,17 @@
 
     <div>
       <!-- DISPLAY QUIZ QUESTION WITH ANSWERS -->
+      <% let counter = 1 %>
       <% for (let question of questions) { %>
         <div class="container">
           <label> <%= question.question %></label>
         </div>
+        <% counter++ %>
 
 
         <% for(let answer of question.answers) { %>
           <div class="container">
-          <input type="radio">
+          <input type="radio" name= "answer<%=counter%>">
            <input  value= '<%= answer %>'>
           </div>
 

@@ -17,12 +17,12 @@
   <body>
     <%- include('partials/header') %>
 
-    <label> <%= name %> &#8217 s results for <%= title %> </label>
+    <label> <%= name %>s results for <%= title %> </label>
 
     <!-- SCORE PULLED FROM QUIZ DB; CSS TO MAKE BIGGER -->
     <label> <%= score %> </label>
 
     <!-- LINK TO SHARE RESULT -->
-    <label> <%= Copy this link to share your results: localhost:8080/<%=:quiz_attempt_id%> </label>
+    <label> Copy this link to share your results: localhost:8080/<%=quiz_attempt_id%>/results</label>
 
     </body>

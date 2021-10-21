@@ -1,0 +1,485 @@
+From ca1b774eb44c43a7f35ab5cfcf55958aca1be658 Mon Sep 17 00:00:00 2001
+From: Tammy <tammyanndo@gmail.com>
+Date: Mon, 18 Oct 2021 21:37:03 -0400
+Subject: [PATCH 3/3] refactor navbar to display login
+
+---
+ package-lock.json                          | 89 ++++++++++++++++++++++
+ package.json                               |  1 +
+ routes/login.js                            |  0
+ server.js                                  | 66 +++++++++++++++-
+ views/createQuiz.ejs                       | 79 ++++++++++---------
+ views/index.ejs                            |  2 +-
+ views/login.ejs                            |  2 +-
+ views/partials/{header.ejs => _header.ejs} | 30 +++++++-
+ views/register.ejs                         |  2 +-
+ 9 files changed, 229 insertions(+), 42 deletions(-)
+ create mode 100644 routes/login.js
+ rename views/partials/{header.ejs => _header.ejs} (54%)
+
+diff --git a/package-lock.json b/package-lock.json
+index f55b47c..89016d0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -10,6 +10,7 @@
+       "license": "ISC",
+       "dependencies": {
+         "chalk": "^2.4.2",
++        "cookie-session": "^1.4.0",
+         "dotenv": "^2.0.0",
+         "ejs": "^2.6.2",
+         "express": "^4.17.1",
+@@ -448,11 +449,41 @@
+         "node": ">= 0.6"
+       }
+     },
++    "node_modules/cookie-session": {
++      "version": "1.4.0",
++      "resolved": "https://registry.npmjs.org/cookie-session/-/cookie-session-1.4.0.tgz",
++      "integrity": "sha512-0hhwD+BUIwMXQraiZP/J7VP2YFzqo6g4WqZlWHtEHQ22t0MeZZrNBSCxC1zcaLAs8ApT3BzAKizx9gW/AP9vNA==",
++      "dependencies": {
++        "cookies": "0.8.0",
++        "debug": "2.6.9",
++        "on-headers": "~1.0.2"
++      }
++    },
+     "node_modules/cookie-signature": {
+       "version": "1.0.6",
+       "resolved": "https://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.6.tgz",
+       "integrity": "sha1-4wOogrNCzD7oylE6eZmXNNqzriw="
+     },
++    "node_modules/cookies": {
++      "version": "0.8.0",
++      "resolved": "https://registry.npmjs.org/cookies/-/cookies-0.8.0.tgz",
++      "integrity": "sha512-8aPsApQfebXnuI+537McwYsDtjVxGm8gTIzQI3FDW6t5t/DAhERxtnbEPN/8RX+uZthoz4eCOgloXaE5cYyNow==",
++      "dependencies": {
++        "depd": "~2.0.0",
++        "keygrip": "~1.1.0"
++      },
++      "engines": {
++        "node": ">= 0.8"
++      }
++    },
++    "node_modules/cookies/node_modules/depd": {
++      "version": "2.0.0",
++      "resolved": "https://registry.npmjs.org/depd/-/depd-2.0.0.tgz",
++      "integrity": "sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==",
++      "engines": {
++        "node": ">= 0.8"
++      }
++    },
+     "node_modules/core-util-is": {
+       "version": "1.0.3",
+       "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.3.tgz",
+@@ -986,6 +1017,17 @@
+       "integrity": "sha1-Wx85evx11ne96Lz8Dkfh+aPZqJg=",
+       "dev": true
+     },
++    "node_modules/keygrip": {
++      "version": "1.1.0",
++      "resolved": "https://registry.npmjs.org/keygrip/-/keygrip-1.1.0.tgz",
++      "integrity": "sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==",
++      "dependencies": {
++        "tsscmp": "1.0.6"
++      },
++      "engines": {
++        "node": ">= 0.6"
++      }
++    },
+     "node_modules/keyv": {
+       "version": "3.1.0",
+       "resolved": "https://registry.npmjs.org/keyv/-/keyv-3.1.0.tgz",
+@@ -1857,6 +1899,14 @@
+         "nodetouch": "bin/nodetouch.js"
+       }
+     },
++    "node_modules/tsscmp": {
++      "version": "1.0.6",
++      "resolved": "https://registry.npmjs.org/tsscmp/-/tsscmp-1.0.6.tgz",
++      "integrity": "sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==",
++      "engines": {
++        "node": ">=0.6.x"
++      }
++    },
+     "node_modules/type-fest": {
+       "version": "0.20.2",
+       "resolved": "https://registry.npmjs.org/type-fest/-/type-fest-0.20.2.tgz",
+@@ -2493,11 +2543,37 @@
+       "resolved": "https://registry.npmjs.org/cookie/-/cookie-0.4.0.tgz",
+       "integrity": "sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg=="
+     },
++    "cookie-session": {
++      "version": "1.4.0",
++      "resolved": "https://registry.npmjs.org/cookie-session/-/cookie-session-1.4.0.tgz",
++      "integrity": "sha512-0hhwD+BUIwMXQraiZP/J7VP2YFzqo6g4WqZlWHtEHQ22t0MeZZrNBSCxC1zcaLAs8ApT3BzAKizx9gW/AP9vNA==",
++      "requires": {
++        "cookies": "0.8.0",
++        "debug": "2.6.9",
++        "on-headers": "~1.0.2"
++      }
++    },
+     "cookie-signature": {
+       "version": "1.0.6",
+       "resolved": "https://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.6.tgz",
+       "integrity": "sha1-4wOogrNCzD7oylE6eZmXNNqzriw="
+     },
++    "cookies": {
++      "version": "0.8.0",
++      "resolved": "https://registry.npmjs.org/cookies/-/cookies-0.8.0.tgz",
++      "integrity": "sha512-8aPsApQfebXnuI+537McwYsDtjVxGm8gTIzQI3FDW6t5t/DAhERxtnbEPN/8RX+uZthoz4eCOgloXaE5cYyNow==",
++      "requires": {
++        "depd": "~2.0.0",
++        "keygrip": "~1.1.0"
++      },
++      "dependencies": {
++        "depd": {
++          "version": "2.0.0",
++          "resolved": "https://registry.npmjs.org/depd/-/depd-2.0.0.tgz",
++          "integrity": "sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw=="
++        }
++      }
++    },
+     "core-util-is": {
+       "version": "1.0.3",
+       "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.3.tgz",
+@@ -2913,6 +2989,14 @@
+       "integrity": "sha1-Wx85evx11ne96Lz8Dkfh+aPZqJg=",
+       "dev": true
+     },
++    "keygrip": {
++      "version": "1.1.0",
++      "resolved": "https://registry.npmjs.org/keygrip/-/keygrip-1.1.0.tgz",
++      "integrity": "sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==",
++      "requires": {
++        "tsscmp": "1.0.6"
++      }
++    },
+     "keyv": {
+       "version": "3.1.0",
+       "resolved": "https://registry.npmjs.org/keyv/-/keyv-3.1.0.tgz",
+@@ -3611,6 +3695,11 @@
+         "nopt": "~1.0.10"
+       }
+     },
++    "tsscmp": {
++      "version": "1.0.6",
++      "resolved": "https://registry.npmjs.org/tsscmp/-/tsscmp-1.0.6.tgz",
++      "integrity": "sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA=="
++    },
+     "type-fest": {
+       "version": "0.20.2",
+       "resolved": "https://registry.npmjs.org/type-fest/-/type-fest-0.20.2.tgz",
+diff --git a/package.json b/package.json
+index 44e5912..ffe9878 100644
+--- a/package.json
++++ b/package.json
+@@ -13,6 +13,7 @@
+   "license": "ISC",
+   "dependencies": {
+     "chalk": "^2.4.2",
++    "cookie-session": "^1.4.0",
+     "dotenv": "^2.0.0",
+     "ejs": "^2.6.2",
+     "express": "^4.17.1",
+diff --git a/routes/login.js b/routes/login.js
+new file mode 100644
+index 0000000..e69de29
+diff --git a/server.js b/server.js
+index 07e93b1..cc64072 100644
+--- a/server.js
++++ b/server.js
+@@ -7,6 +7,7 @@ const sassMiddleware = require("./lib/sass-middleware");
+ const express = require("express");
+ const app = express();
+ const morgan = require("morgan");
++const cookieSession = require('cookie-session');
+ 
+ // PG database client/connection setup
+ const { Pool } = require("pg");
+@@ -32,11 +33,16 @@ app.use(
+ );
+ 
+ app.use(express.static("public"));
++app.use(cookieSession({
++  name: 'session',
++  keys: ['something', 'key2', 'something else']
++}));
+ 
+ // Separated Routes for each Resource
+ // Note: Feel free to replace the example routes below with your own
+ const usersRoutes = require("./routes/users");
+ const widgetsRoutes = require("./routes/widgets");
++const users = require("./routes/users");
+ 
+ // Mount all resource routes
+ // Note: Feel free to replace the example routes below with your own
+@@ -48,6 +54,40 @@ app.use("/api/widgets", widgetsRoutes(db));
+ // Warning: avoid creating more routes in this file!
+ // Separate them into separate routes files (see above).
+ 
++//HELPER FUNCTION (to be moved into helper folder)
++const confirmUser = function (email, password) {
++   return findUserByEmail(email)
++   .then(function(res) {
++     const userFound = res[0]
++     console.log(userFound)
++     if (!userFound) {
++       return false
++     };
++     if (userFound) {
++       const result = (password === userFound.password)
++       if (!result) {
++         return false;
++       } else {
++         return userFound
++       }
++     }
++   })
++
++};
++
++const findUserByEmail = function (email) {
++  const sqlQuery = `
++  SELECT *
++  FROM users
++  WHERE email = $1;
++  `
++
++  return db.query(sqlQuery, [email])
++  .then((dbRes) => dbRes.rows)
++  .catch((err) => console.log(err));
++}
++;
++
+ app.get("/api/quizzes", (req, res) => {
+   const sqlQuery = `
+   SELECT quizzes.title, users.name
+@@ -105,8 +145,12 @@ app.get("/quizzes", (req, res) => {
+   db.query(sqlQuery)
+   .then((dbRes) => {
+     const templateVars = {
++      user: {
++        name: undefined
++      },
+       quizzes: dbRes.rows
+     }
++    console.log("dbRes", dbRes)
+     res.render("index", templateVars)
+     console.log(dbRes.rows);
+ 
+@@ -125,9 +169,29 @@ app.post("/newquiz"), (req, res) => {
+ }
+ 
+ app.get("/login", (req, res) => {
+-  res.render("login");
++const user = undefined
++const templateVars = {
++  user
++}
++  res.render("login", templateVars);
+ });
+ 
++app.post("/login", (req, res) => {
++  const email = req.body.email;
++  const password = req.body.password;
++  // use helper function to confirm that email is found in db, and if so, the password matches
++  const user = confirmUser(email, password);
++  console.log('user login', user)
++
++  // if there is a user (true), then create a cookie, otherwise return error message
++  if (user) {
++    req.session.user_id = user.id;
++    res.redirect("/quizzes");
++  } else {
++    res.status(403).send('Status code 403: Login error. Please try again.');
++  }
++})
++
+ app.get("/register", (req, res) => {
+   res.render("register");
+ });
+diff --git a/views/createQuiz.ejs b/views/createQuiz.ejs
+index b2c1a39..1f5d449 100644
+--- a/views/createQuiz.ejs
++++ b/views/createQuiz.ejs
+@@ -11,50 +11,55 @@
+ 
+   <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
+   <script type="text/javascript" src="/scripts/app.js"></script>
+-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
++  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
++    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+ </head>
+ 
+ <body>
+-  <%- include('partials/header') %>
+-  <h1>Create Quiz 🥔</h1>
+-  <div class="quiz">
+-  <form class="questions">
++  <%- include('partials/_header') %>
++    <h1>Create Quiz 🥔</h1>
++    <div class="quiz">
++      <form class="questions">
+ 
+-    <div class="container">
+-      <label for="title">Enter your title below:</label><br>
+-      <input type="text" name="tite" placeholder="Title">
+-    </div><br>
++        <div class="container">
++          <label for="title">Enter your title below:</label><br>
++          <input type="text" name="tite" placeholder="Title">
++        </div><br>
+ 
+-    <div class="container">
+-      <div class="form-group">
+-        <label for="exampleFormControlTextarea1">Add a short description of your quiz:</label>
+-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+-      </div>
+-    </div>
++        <div class="container">
++          <div class="form-group">
++            <label for="exampleFormControlTextarea1">Add a short description of your quiz:</label>
++            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
++          </div>
++        </div>
+ 
+-      <div class="container">
+-        <label for="question1">Enter your question here:</label><br>
+-        <input type="text" name="question1" placeholder="Question 1"><br><br>
++        <div class="container">
++          <form>
++            <!-- need to add action for the form (reset form and add question) -->
++            <label for="question1">Enter your question here:</label><br>
++            <input type="text" name="question1" placeholder="Question 1"><br><br>
+ 
+-        <div class="answer">
+-          <label for="answer-btn">Enter your answers below, and select the correct answer:
+-          <div class="answers1">
+-            <input type="radio" name="answer-btn" id="answer1">
+-            <input type="text" name="input-answer" id="input-answer1" placeholder="Answer 1">
+-          </div>
+-          <div class="answers2">
+-            <input type="radio" name="answer-btn" id="answer2">
+-            <input type="text" name="input-answer" id="input-answer2" placeholder="Answer 2">
+-          </div>
+-          <div class="answers3">
+-            <input type="radio" name="answer-btn" id="answer3">
+-            <input type="text" name="input-answer" id="input-answer3" placeholder="Answer 3">
+-          </div>
+-          <div class="answers4">
+-            <input type="radio" name="answer-btn" id="answer4">
+-            <input type="text" name="input-answer" id="input-answer4" placeholder="Answer 4">
+-          </div>
+-        </label>
++            <div class="answer">
++              <label for="answer-btn">Enter your answers below, and select the correct answer:
++                <div class="answers1">
++                  <input type="radio" name="answer-btn" id="answer1">
++                  <input type="text" name="input-answer" id="input-answer1" placeholder="Answer 1">
++                </div>
++                <div class="answers2">
++                  <input type="radio" name="answer-btn" id="answer2">
++                  <input type="text" name="input-answer" id="input-answer2" placeholder="Answer 2">
++                </div>
++                <div class="answers3">
++                  <input type="radio" name="answer-btn" id="answer3">
++                  <input type="text" name="input-answer" id="input-answer3" placeholder="Answer 3">
++                </div>
++                <div class="answers4">
++                  <input type="radio" name="answer-btn" id="answer4">
++                  <input type="text" name="input-answer" id="input-answer4" placeholder="Answer 4">
++                </div>
++              </label>
++              <input type="submit" value="Add question to your quiz">
++          </form>
+         </div>
+ 
+ 
+diff --git a/views/index.ejs b/views/index.ejs
+index d1e245f..e0a5f95 100644
+--- a/views/index.ejs
++++ b/views/index.ejs
+@@ -15,7 +15,7 @@
+ </head>
+ 
+ <body>
+-  <%- include('partials/header') %>
++  <%- include('partials/_header') %>
+   <% for(let quiz of quizzes) { %>
+     <h3><%= quiz.title %></h3>
+     <% } %>
+diff --git a/views/login.ejs b/views/login.ejs
+index fea8fb8..efc987c 100644
+--- a/views/login.ejs
++++ b/views/login.ejs
+@@ -17,7 +17,7 @@
+ 
+ <body>
+ 
+-  <%- include('partials/header') %>
++  <%- include('partials/_header') %>
+     <h2>Login To QuizApp❓💡</h2>
+ 
+     <main style="margin: 1em;">
+diff --git a/views/partials/header.ejs b/views/partials/_header.ejs
+similarity index 54%
+rename from views/partials/header.ejs
+rename to views/partials/_header.ejs
+index 2f1faf6..9f3d95f 100644
+--- a/views/partials/header.ejs
++++ b/views/partials/_header.ejs
+@@ -1,4 +1,4 @@
+-<header>
++<!-- <header>
+   <nav class="navbar navbar-expand-lg navbar-light bg-light">
+   <a class="navbar-brand" href="#">Quiz-App</a>
+   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+@@ -22,4 +22,32 @@
+     </ul>
+     </div>
+     </nav>
++</header> -->
++
++
++<header>
++  <nav class="navbar navbar-expand-ld navbar-light bg-light">
++    <a class="navbar-brand" href="/urls">Quiz-App</a>
++
++      <div class="navbar-nav">
++        <a class="nav-item nav-link" href="/">Home</a>
++        <a class="nav-item nav-link" href="/newquiz">Create New Quiz</a>
++      </div>
++
++    <ul>
++      <% if (user) { %>
++        Logged in as <%= user.name %>
++        <form class="form-inline" action="/logout" method="POST">
++          <div class="form-group mb-2">
++            <button type="submit" class="btn btn-outline-dark">Logout</button>
++          </div>
++        </form>
++      <% } else { %>
++          <a href="/login" class="btn btn-outline-dark">Login</a>
++
++          <a href="/register" class="btn btn-outline-dark">Register</a>
++
++          <% } %>
++    </ul>
++  </nav>
+ </header>
+diff --git a/views/register.ejs b/views/register.ejs
+index b565224..b84f8bf 100644
+--- a/views/register.ejs
++++ b/views/register.ejs
+@@ -17,7 +17,7 @@
+ 
+ <body>
+ 
+-  <%- include('partials/header') %>
++  <%- include('partials/_header') %>
+     <h2>Register with QuizAPP❓ 💡</h2>
+     <main style="margin: 1em;">
+       <h3>Create Account</h3>
+-- 
+2.30.1 (Apple Git-130)
+
