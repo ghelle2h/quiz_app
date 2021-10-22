@@ -227,8 +227,6 @@ app.post("/newquiz", (req, res) => {
       res.redirect(`/new_question/${newQuizId}`)
     })
     .catch((err) => console.log(err))
-
-
 });
 
 app.get("/new_question/:quiz_id", (req, res) => {
@@ -299,16 +297,11 @@ app.post("/new_question/:quiz_id", (req, res) => {
 
 
 app.get("/", (req, res) => {
-  if(req.session) {
-    res.redirect("/quizzes");
-  } else {
-    res.redirect("/login")
-  }
 
+  res.redirect("/quizzes");
 });
 
 app.get("/quizzes", (req, res) => {
-
 
   const sqlQuery = `
   SELECT quizzes.title, quizzes.id
@@ -327,7 +320,6 @@ app.get("/quizzes", (req, res) => {
           name: req.session.user_name
         }
       }
-
       res.render("index", templateVars)
       console.log("deRes.rows:", dbRes.rows);
 

@@ -1,57 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <title>Home Page</title>
-
-  <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
-  <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
-  <link rel="stylesheet" href="/styles/main.css" type="text/css" />
-  <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
-
-  <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
-  <script type="text/javascript" src="/scripts/app.js"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 </head>
-
-<body>
+<body class="createbody">
   <%- include('partials/header') %>
-  <h1>Create Quiz 🥔</h1>
-  <div class="quiz">
-  <form action="/newquiz" method="POST" >
-
-    <div class="container">
-      <label for="title">Enter your title below:</label><br>
-      <input type="text" name="title" placeholder="Title">
-    </div><br>
-
-    <div class="container">
-      <div class="form-group">
-        <label for="description">Add a short description of your quiz:</label>
-        <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+  <h1 class="title">Build your quiz:</h1>
+  <div class="container" id="main">
+    <img class="image" src="/images/clipart938295.png">
+    <div class="quiz">
+      <form action="/newquiz" method="POST">
+        <div class="container">
+          <label for="title">Enter your title below:</label><br>
+          <input type="text" name="title" placeholder="Title">
+        </div><br>
+        <div class="container">
+          <div class="form-group">
+            <label for="description">Add a short description of your quiz:</label>
+            <textarea class="form-control" id="description"></textarea>
+          </div>
+          <div class="container">
+            <input type="radio" name="isPrivate">
+            <label for="isPrivate">Would you like to make this quiz private?</label>
+          </div>
+          <div class="container">
+            <button type="submit" class="btn btn-primary">Add quiz</button>
+          </div>
+        </div>
+      </form>
+      <div id="questions-container"></div>
       </div>
-      <div class="container">
-        <input type="radio" name="isPrivate">
-        <label for="isPrivate">Would you like to make this quiz private?</label>
-      </div>
-    <div class="container">
-      <button type="submit" class="btn btn-primary">Add quiz</button>
-    </div>
-    </div>
-  </form>
-
-
-
-
-
-
-
-
-    <div id="questions-container"></div>
-
-
-
 </body>
-
-
 </html>

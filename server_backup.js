@@ -212,6 +212,7 @@ app.post("/newquiz", (req, res) => {
   const { title, description, isPrivate } = req.body
   console.log("inside newquiz post", req.body.title)
   const user_id = req.session.user_id
+  console.log(req.body.isPrivate)
   console.log(user_id)
   const sqlQuery = `
     INSERT INTO
@@ -299,16 +300,11 @@ app.post("/new_question/:quiz_id", (req, res) => {
 
 
 app.get("/", (req, res) => {
-  if(req.session) {
-    res.redirect("/quizzes");
-  } else {
-    res.redirect("/login")
-  }
 
+  res.redirect("/quizzes");
 });
 
 app.get("/quizzes", (req, res) => {
-
 
   const sqlQuery = `
   SELECT quizzes.title, quizzes.id
@@ -327,7 +323,6 @@ app.get("/quizzes", (req, res) => {
           name: req.session.user_name
         }
       }
-
       res.render("index", templateVars)
       console.log("deRes.rows:", dbRes.rows);
 
@@ -437,17 +432,19 @@ app.get("/register", (req, res) => {
   app.get("/quizzes/:quiz_id", (req, res) => {
     const quiz_id = req.params.quiz_id
     const sqlQuery = `
-    SELECT quizzes.title, quizzes.description, quiz_questions.question, quizzes.id as quiz_id, ARRAY_AGG (answer) as answers
+    SELECT quizzes.title, quizzes.description, quiz_questions.question, quizzes.id as quiz_id, ARRAY_AGG (answer) as answers, quiz_answers.id as answer_id
     FROM quizzes
     INNER JOIN quiz_questions ON quiz_questions.quiz_id = quizzes.id
     INNER JOIN quiz_answers ON quiz_answers.question_id = quiz_questions.id
     WHERE quiz_id = $1
-    GROUP BY quizzes.title, quizzes.description, quizzes.id, quiz_questions.question
+    GROUP BY quizzes.title, quizzes.description, quizzes.id, quiz_questions.question, quiz_answers.id
     ;
     `
     db.query(sqlQuery, [quiz_id])
       .then((dbRes) => {
+        console.log("dbRes rows: ", dbRes.rows)
        const templateVars = {
+         answer_id: dbRes.rows[0].id,
          quiz_id: req.params.quiz_id,
          questions: dbRes.rows,
          user: req.session.user_id
@@ -461,6 +458,8 @@ app.get("/register", (req, res) => {
 
     const user_id = req.session.user_id
     const quiz_id = req.params.quiz_id
+
+
     console.log(user_id)
     console.log(quiz_id)
     console.log(req.body)
@@ -474,6 +473,7 @@ app.get("/register", (req, res) => {
     `
     db.query(sqlQuery, [user_id, quiz_id])
           .then((data) => {
+
             console.log(data.rows);
             // for()
             // let sqlQuery1 = `

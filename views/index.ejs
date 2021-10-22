@@ -1,14 +1,26 @@
-
-  <%- include('partials/header') %>
-
+<link rel="stylesheet" href="/styles/index.css" />
+<link rel="stylesheet" href="/styles/main.scss" />
+<%- include('partials/header') %>
 <body>
-  <% for(let quiz of quizzes) {
-    console.log("quiz:", quiz);
-    %>
-    <a href="/quizzes/<%= quiz.id %>"><%= quiz.title %></a>
-    <% } %>
+  <div class="page">
+    <img class="image" src="/images/quiz-g2e87a0f6c_1920.png">
+    <div class='quiz_container'>
+      <h1>Choose a quiz to do!</h1>
+      <div class=quiz_list>
+        <% for(let quiz of quizzes) { console.log("quiz:", quiz); %>
+        <li><a href="/quizzes/<%= quiz.id %>">
+          <%= quiz.title %>
+        </a></li>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  </body>
+  </html>
 
 
-</body>
 
-</html>
+
+
+
+
