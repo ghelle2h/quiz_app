@@ -210,7 +210,7 @@ app.post("/register", (req, res) => {
 
 app.post("/newquiz", (req, res) => {
   const { title, description, isPrivate } = req.body
-  console.log(req.body.title)
+  console.log("inside newquiz post", req.body.title)
   const user_id = req.session.user_id
   console.log(user_id)
   const sqlQuery = `
@@ -245,7 +245,7 @@ app.get("/new_question/:quiz_id", (req, res) => {
 
 
 app.post("/new_question/:quiz_id", (req, res) => {
-  const { question, quiz_id } = req.body
+  const { question, quiz_id} = req.body
 
   const sqlQuery1 = `
         INSERT INTO
@@ -253,25 +253,41 @@ app.post("/new_question/:quiz_id", (req, res) => {
         VALUES
           ($1, $2)
           RETURNING *
-
         ;
         `
   db.query(sqlQuery1, [quiz_id, question])
     .then((dbRes) => {
       console.log(dbRes.rows[0])
       newQuestionId = dbRes.rows[0].id;
-      const { answer1, answer2, answer3, answer4 } = req.body
+      let { answer1, answer2, answer3, answer4, answer_btn4, answer_btn1, answer_btn2, answer_btn3 } = req.body
+      if(!answer_btn4) {
+        answer_btn4 = false;
+      }
+      if(!answer_btn3) {
+        answer_btn3 = false;
+      }
+      if(!answer_btn2) {
+        answer_btn2 = false;
+      }
+      if(!answer_btn1) {
+        answer_btn1 = false;
+      }
+      console.log('isCorrect4: ', answer_btn4);
+      console.log('isCorrect3: ', answer_btn3);
+      console.log('isCorrect2: ', answer_btn2);
+      console.log('isCorrect1: ', answer_btn1);
+
       const sqlQuery2 = `
               INSERT INTO
-                  quiz_answers(question_id, answer)
+                  quiz_answers(question_id, answer, isCorrect)
                     VALUES
-                      ($1, $2), ($1, $3), ($1, $4), ($1, $5)
+                      ($1, $2, $6), ($1, $3, $7), ($1, $4, $8), ($1, $5, $9)
                     RETURNING *
                     ;
                     `
-      db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4])
-        .then((dbRes) => {
-          // console.log(dbRes.rows[0])
+      db.query(sqlQuery2, [newQuestionId, answer1, answer2, answer3, answer4, answer_btn1, answer_btn2, answer_btn3, answer_btn4])
+        .then(() => {
+
 
         })
     });
@@ -290,7 +306,7 @@ app.get("/", (req, res) => {
 app.get("/quizzes", (req, res) => {
 
   const sqlQuery = `
-  SELECT quizzes.title
+  SELECT quizzes.title, quizzes.id
   FROM quizzes
 
 
@@ -412,7 +428,7 @@ app.get("/register", (req, res) => {
     })
 });
 
-  app.get("/:quiz_id", (req, res) => {
+  app.get("/quizzes/:quiz_id", (req, res) => {
     const quiz_id = req.params.quiz_id
     const sqlQuery = `
     SELECT quizzes.title, quizzes.description, quiz_questions.question, quizzes.id as quiz_id, ARRAY_AGG (answer) as answers
@@ -426,6 +442,7 @@ app.get("/register", (req, res) => {
     db.query(sqlQuery, [quiz_id])
       .then((dbRes) => {
        const templateVars = {
+         quiz_id: req.params.quiz_id,
          questions: dbRes.rows,
          user: req.session.user_id
        }
@@ -434,21 +451,54 @@ app.get("/register", (req, res) => {
 
   });
 
-  app.post("/:quiz_id", (req, res) =>{
+  app.post("/quizzes/:quiz_id", (req, res) =>{
+
     const user_id = req.session.user_id
     const quiz_id = req.params.quiz_id
-    const {isCorrect} = req.body
+    console.log(user_id)
+    console.log(quiz_id)
+    console.log(req.body)
     const sqlQuery = `
-    INSERT
-      (user_id, quiz_id, isCorrect)
+    INSERT INTO
+      quiz_attempts(user_id, quiz_id)
     VALUES
-      ($1, $2, $3)
+      ($1, $2)
     RETURNING *
     ;
     `
-    db.query(sqlQuery, [user_id, quiz_id, isCorrect])
+    db.query(sqlQuery, [user_id, quiz_id])
+          .then((data) => {
+            console.log(data.rows);
+            // for()
+            // let sqlQuery1 = `
+            // INSERT INTO
+            //   answer_attempts(answer_id, user_id, quiz_attempt_id, question_id)
+            // VALUES
+            //   ($1, $2, $3, $4)
+            // ;`
 
-  })
+
+          })
+
+      //   let sqlQuery1 = `
+      //   INSERT INTO
+      //     answer_attempts(answer_id, user_id, quiz_attempt_id, question_id)
+      //   VALUES
+      //     ($1, $2, $3, $4)
+      //   ;
+      //   `
+      // db.query(sqlQuery1)
+      // // console.log(data.rows[0].id)
+      // // console.log(data.rows[0])
+
+      // return data.rows[0].id;
+      // })
+      //   .then((id) =>{
+      //     res.redirect(`/${id}/results`)
+        })
+
+
+
 
 
 
@@ -465,18 +515,21 @@ app.get("/:quiz_attempt_id/results", (req, res) => {
   //console.log("NAV " + quiz_attempt_id);
   //req.params.quiz_attempt_id = 1;
   let string = `
-  SELECT users.name, answer_attempts.id, answer, question, isCorrect, quiz_attempt_id,
-  answer_attempts.user_id, quizzes.title FROM users JOIN quiz_attempts ON
-  users.id = quiz_attempts.user_id JOIN answer_attempts ON
-  quiz_attempts.id = quiz_attempt_id JOIN quiz_answers ON (answer_id = quiz_answers.id) JOIN quizzes
-  ON (quiz_attempts.quiz_id = quizzes.id) JOIN quiz_questions ON (quiz_questions.id = answer_attempts.question_id)
+  SELECT users.name, answer_attempts.id, answer, question, isCorrect, quiz_attempt_id, answer_attempts.user_id, quizzes.title
+  FROM users
+  JOIN quiz_attempts ON users.id = quiz_attempts.user_id
+  JOIN answer_attempts ON quiz_attempts.id = quiz_attempt_id
+  JOIN quiz_answers ON (answer_id = quiz_answers.id)
+  JOIN quizzes ON (quiz_attempts.quiz_id = quizzes.id)
+  JOIN quiz_questions ON (quiz_questions.id = answer_attempts.question_id)
   WHERE quiz_attempts.id = $1 AND isCorrect = TRUE
-    `;
+    ;`
   //ORDER BY id;
+  console.log("quiz attempt id: ", req.params.quiz_attempt_id)
   db.query(string, [req.params.quiz_attempt_id])
     .then(data => {
       let templateVar = { attempt: data.rows }
-      console.log(templateVar["attempt"]);
+      console.log("templateVars results route: ", templateVar["attempt"]);
       let templateVar1 = {
         name: templateVar["attempt"][0].name,
         title: templateVar["attempt"][0].title,

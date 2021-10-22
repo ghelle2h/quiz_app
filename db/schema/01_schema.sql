@@ -32,15 +32,15 @@ CREATE TABLE quiz_questions (
 CREATE TABLE quiz_answers (
   id SERIAL PRIMARY KEY NOT NULL,
   question_id INTEGER REFERENCES quiz_questions(id) ON DELETE CASCADE,
-  answer VARCHAR(255) NOT NULL
-
+  answer VARCHAR(255) NOT NULL,
+  isCorrect BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE quiz_attempts (
   id SERIAL PRIMARY KEY NOT NULL,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  quiz_id INTEGER REFERENCES quizzes(id) ON DELETE CASCADE,
-  isCorrect BOOLEAN NOT NULL DEFAULT FALSE
+  quiz_id INTEGER REFERENCES quizzes(id) ON DELETE CASCADE
+
 );
 
 CREATE TABLE answer_attempts (
