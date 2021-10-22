@@ -23,17 +23,17 @@ INSERT INTO quiz_questions(quiz_id, question)
             VALUES (3, 'Which country''s national animal is a tiger');
 
 
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (1, 3, TRUE);
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (1, 2, FALSE);
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (1, 1, FALSE);
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (1, 3, TRUE);     --BB id:1
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (1, 2, FALSE);    --BB id:2
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (1, 1, FALSE);    --BB id:3
 
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (2, 2, TRUE);
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (2, 1, FALSE);
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (2, 3, FALSE);
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (2, 2, TRUE);       --BB id:4
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (2, 1, FALSE);      --BB id:5
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (2, 3, FALSE);      --BB id:6
 
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (3, 3, TRUE);
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (3, 1, FALSE);
-INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (3, 4, FALSE);
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (3, 3, TRUE);       --BB id:7
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (3, 1, FALSE);      --BB id:8
+INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (3, 4, FALSE);      --BB id:9
 
 INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (4, 1, TRUE);
 INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (4, 2, FALSE);
@@ -50,8 +50,8 @@ INSERT INTO quiz_answers(question_id, answer, isCorrect) VALUES (6, 4, FALSE);
 
 INSERT INTO quiz_attempts (quiz_id, user_id) VALUES (3, 2);
 
-INSERT INTO answer_attempts(answer_id, user_id) VALUES (1, 1);
-INSERT INTO answer_attempts(answer_id, user_id) VALUES (2, 1);
+--INSERT INTO answer_attempts(answer_id, user_id) VALUES (1, 1);
+--INSERT INTO answer_attempts(answer_id, user_id) VALUES (2, 1);
 
 INSERT INTO answer_attempts(answer_id, user_id, quiz_attempt_id, question_id) VALUES (10, 2, 1, 4); --TRUE
 INSERT INTO answer_attempts(answer_id, user_id, quiz_attempt_id, question_id) VALUES (15, 2, 1, 5); --FALSE
