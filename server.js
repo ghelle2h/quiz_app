@@ -237,8 +237,15 @@ app.post("/register", (req, res) => {
     const templateVars = {
       user,
       quiz_id
+    };
+    if (req.session.user_id && req.session.user_name) {
+      templateVars['user'] = {
+        id: req.session.user_id,
+        name: req.session.user_name
+        }
+    } else {
+      templateVars['user'] = null;
     }
-    // console.log(quiz_id);
 
         res.render("quiz_questions", templateVars);
       })
