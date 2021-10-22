@@ -16,30 +16,38 @@
 
   <body>
     <%- include('partials/header') %>
-
     <div>
       <!-- DISPLAY QUIZ QUESTION WITH ANSWERS -->
-      <% let counter = 1 %>
+      <% let counter = 0 %>
       <% for (let question of questions) { %>
+
         <div class="container">
           <label> <%= question.question %></label>
         </div>
-        <% counter++ %>
+<!-- <%=counter++%> -->
 
+<!-- <p><%=questions.question_id%></p>> -->
+<form method="POST" action="/quizzes/<%=quiz_id%>" id="quiz_submit">
 
         <% for(let answer of question.answers) { %>
+
           <div class="container">
-          <input type="radio" name= "answer<%=counter%>">
+          <input type="radio" name= "answer<%=counter%>" value= '<%= answer %>'>
            <input  value= '<%= answer %>'>
           </div>
 
         <% } %>
       <% } %>
+
+      <p id="quiz_id"><%=quiz_id%></p>
     </div>
 
     <div>
       <!-- BUTTON TO SUBMIT QUIZ (REDIRECT TO RESULTS PAGE)-->
+
       <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+
     </div>
 
   </body>

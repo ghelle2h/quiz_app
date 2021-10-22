@@ -19,6 +19,7 @@
 
 <body class="createbody">
   <%- include('partials/header') %>
+<<<<<<< HEAD
   <h1 class="title">Build your quiz:</h1>
   <div class="container" id="main">
     <img class="image" src="/images/clipart938295.png">
@@ -46,6 +47,21 @@
       </form>
 
       <div id="questions-container"></div>
+=======
+  <h1>Create Quiz 🥔</h1>
+  <div class="quiz">
+  <form action="/newquiz" method="POST" >
+
+    <div class="container">
+      <label for="title">Enter your title below:</label><br>
+      <input type="text" name="title" placeholder="Title">
+    </div><br>
+
+    <div class="container">
+      <div class="form-group">
+        <label for="description">Add a short description of your quiz:</label>
+        <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+>>>>>>> test_branch
       </div>
 </body>
 </html>
